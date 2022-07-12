@@ -1,0 +1,2 @@
+Scrivi un'applicazione che mostra una lista di prodotti (magari in forma tabellare), l'utente che utilizzerà l'app poi potrà inserire nuovi prodotti, modificare quelli esistenti oppure cancellarli.
+Il prodotto ha un nome, un prezzo e una categoria (categorie di default: pc, tablet, mouse, monitor...). La lista può essere filtrata per nome, per categoria e per fascia prezzo (tipo su amazon che puoi scegliere tra 0-50€, 50-100€, 100-200€ e così via).
