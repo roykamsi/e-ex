@@ -9,14 +9,14 @@ const router = createRouter({
     {
       path: "/",
       redirect: "/products",
-      name: "products",
-      component: ProductList,
+      name: "home",
       children: [{
         name: "ProductElement",
         path: "/products/:pid",
         component: ProductElement,
       }],
     },
+    {path: '/products', name: 'products', component: ProductList},
     {path: "/login", name: 'Login', component: LoginPage},
   ],
 });

@@ -1,7 +1,13 @@
-import {createStore} from 'vuex'
+import { createStore } from "vuex";
+import products from "./modules/products/index.js";
 
 const store = createStore({
-  modules: {},
-})
+  modules: {
+    products: {
+      products,
+      namespaced: true,
+    },
+  },
+});
 
-export default store
+export default store;
