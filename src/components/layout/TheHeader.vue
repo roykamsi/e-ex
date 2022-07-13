@@ -4,9 +4,9 @@
       <h1>
         <router-link to="/">E-Ex</router-link>
       </h1>
-      <span>
-        <router-link to="/login">Login</router-link>
-      </span>
+      <h2>
+          <router-link to="/login">Login</router-link>
+      </h2>
     </nav>
   </header>
 </template>
@@ -15,7 +15,7 @@
 import { RouterLink } from "vue-router";
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
 header {
   padding: 1rem 5rem;
 }

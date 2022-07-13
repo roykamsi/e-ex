@@ -2,13 +2,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/i,
+        test: /\.scss$/i,
         use: [
           "vue-style-loader",
-          "style-loader",
           "css-loader",
+          'sass-loader',
           {
-            loader: ["css-loader", "postcss-loader"],
+            loader: "css-loader",
             options: {
               postcssOptions: {
                 importLoaders: 1,

@@ -5,12 +5,13 @@ import TheHeader from "./components/layout/TheHeader.vue";
 
 <template>
   <section>
+    <button @click="this.$store.commit('increment')">count</button>
     <the-header></the-header>
     <router-view></router-view>
   </section>
 </template>
 
-<style>
+<style lang="scss">
 @import "./assets/base.css";
 section {
   text-align: center;
