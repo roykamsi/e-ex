@@ -6,7 +6,9 @@ import TheHeader from "./components/layout/TheHeader.vue";
 <template>
   <section>
     <the-header></the-header>
-    <router-view></router-view>
+    <div>
+      <router-view> </router-view>
+    </div>
   </section>
 </template>
 

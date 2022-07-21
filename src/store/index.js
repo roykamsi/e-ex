@@ -1,13 +1,22 @@
 import { createStore } from "vuex";
-import products from "./modules/products/index.js";
+import products from "./data/productList.js";
+import getters from "./getters.js";
+import actions from "./actions.js";
+import mutations from "./mutations.js";
+import filters from './data/filters.js'
+import filteredProducts from './data/filteredProducts.js'
 
 const store = createStore({
-  modules: {
-    products: {
+  state() {
+    return {
+      filters,
       products,
-      namespaced: true,
-    },
+      filteredProducts
+    };
   },
+  getters,
+  mutations,
+  actions,
 });
 
 export default store;

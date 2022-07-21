@@ -16,9 +16,6 @@ import { RouterLink } from "vue-router";
 </script>
 
 <style lang="scss" scoped>
-header {
-  padding: 1rem 5rem;
-}
 nav {
   display: flex;
   justify-content: space-between;

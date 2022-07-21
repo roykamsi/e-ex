@@ -1,9 +1,8 @@
-export default {
-  products: [
+export default [
     {
       id: 1,
       name: "SAMSUNG Monitor",
-      price: 298.2,
+      price: 298.20,
       category: ["monitor", "gaming", "monitor tv"],
       image: "https://images.eprice.it/nobrand/0/lightbox/817/210718817/DAM210718817-0-0bbcd53d-1456-4be2-b8e2-32cdc4abe9a2.jpg"
     },
@@ -42,5 +41,4 @@ export default {
       category: ["pc", "desktop", "office", "work"],
       image: "https://images.eprice.it/nobrand/0/lightbox/987/303345987/36AE0877-9D2A-48B8-8D93-496D0DE5BEB6.jpg"
     },
-  ],
-};
+  ]
