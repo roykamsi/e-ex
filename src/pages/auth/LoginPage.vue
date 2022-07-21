@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <h2>header</h2>
-  </div>
+  <section>
+    <h2>LoginPage</h2>
+  </section>
 </template>
 
 <script setup>

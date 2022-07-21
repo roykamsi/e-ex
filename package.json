@@ -1,6 +1,6 @@
 {
   "name": "e-commerce-exercise",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -16,8 +16,10 @@
     "@vitejs/plugin-vue": "^2.3.3",
     "eslint": "^8.5.0",
     "eslint-plugin-vue": "^9.0.0",
-    "postcss": "^8.4.14",
-    "postcss-loader": "^7.0.1",
+    "install": "^0.13.0",
+    "node-sass": "^7.0.1",
+    "sass": "^1.53.0",
+    "sass-loader": "^13.0.2",
     "vite": "^2.9.12"
   }
 }
