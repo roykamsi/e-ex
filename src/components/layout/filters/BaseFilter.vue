@@ -14,7 +14,6 @@
         step="50"
         id="name"
         v-model="priceFiltering"
-        @change="setFilter"
       />
     </div>
     <div>
@@ -27,12 +26,12 @@
             :id="cat"
             :value="cat"
             v-model="checkboxFiltering"
-            @click="setFilter"
           />
           <label :for="cat">{{ cat }}</label>
         </li>
       </ul>
     </div>
+    <button @click="setFilter">Filter products</button>
   </div>
 </template>
 
@@ -44,9 +43,9 @@ const store = useStore();
 const emit = defineEmits(["updateProds"]);
 // const getFilteredProducts = store.getters.filteredProducts;
 
-const nameFiltering = ref("");
-const priceFiltering = ref(0);
-const checkboxFiltering = ref([]);
+let nameFiltering = ref("");
+let priceFiltering = ref(1000);
+let checkboxFiltering = ref([]);
 
 // GETTING EACH ARRAY
 const catArray = ref([]);
@@ -89,10 +88,14 @@ const fCheckbox = computed(() => store.state.filters.checkbox);
 // FILTERING SYSTEM
 
 function setFilter() {
-  emit("updateProds");
-  console.log(products, fCheckbox.value);
-  const filtered = products.filter((v) => v.price <= fPrice.value && v.category.includes(fCheckbox.value))
+  console.log(fCheckbox.value, fPrice.value, fName.value);
+  const filtered = products.filter((prod) => {
+    // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
+    return prod.price <= fPrice.value
+  });
   store.commit("loadFilteredProducts", filtered);
+  emit("updateProds");
+  console.log(filtered);
 }
 </script>
 

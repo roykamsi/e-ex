@@ -31,10 +31,12 @@ useRoute();
 useRouter();
 let products = ref(null);
 
-const filteredProducts = computed(() => store.getters["getFilteredProducts"]);
+const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
+const isFiltering = computed(()=>store.getters['isFiltering'])
 
 async function getProducts() {
-  if (filteredProducts.value > 0) {
+  if (isFiltering.value) {
+    console.log('works', store.getters["getFilteredProducts"]);
     return products.value = computed(() => store.getters["getFilteredProducts"]).value
   } else {
     console.log("Actual products");

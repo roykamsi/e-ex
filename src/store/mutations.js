@@ -8,6 +8,6 @@ export default {
     state.filters.checkbox = payload.checkbox
   },
   loadFilteredProducts(state, payload) {
-    state.products = payload
+    state.filteredProducts = payload
   }
 };
