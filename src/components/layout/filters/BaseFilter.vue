@@ -18,6 +18,7 @@
     </div>
     <div>
       <label for="name">By category</label>
+      <button @click="allTrue">Select all</button>
       <ul>
         <li v-for="cat in catMerged" :key="cat">
           <input
@@ -46,6 +47,7 @@ const emit = defineEmits(["updateProds"]);
 let nameFiltering = ref("");
 let priceFiltering = ref(1000);
 let checkboxFiltering = ref([]);
+let selectAll = ref(false);
 
 // GETTING EACH ARRAY
 const catArray = ref([]);
@@ -72,7 +74,7 @@ watch(
 ); // PRICE
 watch(
   () => checkboxFiltering.value,
-  (state) => (store.state.filters.checkbox = state)
+  (state) => store.commit("setFilters", { checkbox: state })
 ); // CHECKBOX
 
 // ASYNC UNIT TESTING //
@@ -87,11 +89,37 @@ const fCheckbox = computed(() => store.state.filters.checkbox);
 
 // FILTERING SYSTEM
 
+function allTrue() {
+  let selectionData = ref(catMerged); //This is the array to be added
+  selectAll.value = !selectAll.value;
+  if (!selectAll.value) {
+    return selectionData.value.forEach((item) =>
+      checkboxFiltering.value.push(item)
+    );
+  } else {
+    return (checkboxFiltering.value.length = 0);
+  }
+}
+
 function setFilter() {
-  console.log(fCheckbox.value, fPrice.value, fName.value);
+  console.log(nameFiltering.value, priceFiltering.value, nameFiltering.value);
   const filtered = products.filter((prod) => {
     // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
-    return prod.price <= fPrice.value
+    if (fCheckbox.value === undefined && fName.value === undefined) {
+      return prod.price <= fPrice.value;
+    } else if (fCheckbox.value !== undefined) {
+      return (
+        prod.price <= fPrice.value &&
+        prod.category.some((v) => fCheckbox.value.some((c) => v === c))
+      );
+    } else if (fName.value !== undefined) {
+      allTrue();
+      return (
+        prod.price <= fPrice.value &&
+        prod.category.some((v) => fCheckbox.value.some((c) => v === c)) &&
+        prod.name.toLowerCase().includes(fName.value)
+      );
+    }
   });
   store.commit("loadFilteredProducts", filtered);
   emit("updateProds");
