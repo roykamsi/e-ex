@@ -2,6 +2,9 @@ export default {
   getProducts(state) {
     return state.products;
   },
+  getFilters(state) {
+    return state.filters
+  },
   getFilteredProducts(state) {
     return state.filteredProducts
   },
