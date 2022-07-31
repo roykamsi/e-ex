@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "vue": "^3.2.37",
+    "vue-axios": "^3.4.1",
     "vue-router": "^4.0.16",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
+    "axios": "^0.27.2",
     "eslint": "^8.5.0",
     "eslint-plugin-vue": "^9.0.0",
     "install": "^0.13.0",

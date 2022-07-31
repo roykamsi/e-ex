@@ -5,7 +5,8 @@
     </aside>
     <section>
       <h2>Product List</h2>
-      <div>
+      <h1 v-if="products.length === 0">No products found, try setting filters.</h1>
+      <div v-else>
         <product-element
           v-for="product in products"
           :key="product.id"

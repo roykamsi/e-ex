@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+button {
+  padding: .6rem 1rem;
+}
+
+
+
+/*CUSTOM UTILITY CLASSES*/
+.error {
+  color: rgb(205, 42, 42);
+  font-style: italic;
+}
+.error__detail {
+  font-weight: bold;
+}

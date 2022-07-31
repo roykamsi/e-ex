@@ -104,7 +104,8 @@ function allTrue() {
 async function setFilter() {
   const filtered = await products.filter((prod) => {
     // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
-    if (fCheckbox.value === undefined && fName.value.length === 0) {
+    if (fCheckbox.value === undefined || fCheckbox.value.length === 0 && fName.value.length === 0) {
+      allTrue()
       return prod.price <= fPrice.value;
     } else if (fCheckbox.value.length > 0 && fName.value.length === 0 || fName.value === undefined) {
       return (
