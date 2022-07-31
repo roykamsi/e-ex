@@ -1,3 +1,6 @@
+import base from './style/base.css'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -9,6 +12,8 @@ const app = createApp(App)
 
 app.use(router)
 app.use(store)
+app.use(VueAxios, axios)
+app.use(base)
 
 app.component("BaseCard", BaseCard)
 

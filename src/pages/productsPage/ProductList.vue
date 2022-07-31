@@ -5,7 +5,8 @@
     </aside>
     <section>
       <h2>Product List</h2>
-      <div>
+      <h1 v-if="products.length === 0">No products found, try setting filters.</h1>
+      <div v-else>
         <product-element
           v-for="product in products"
           :key="product.id"
@@ -31,13 +32,13 @@ useRoute();
 useRouter();
 let products = ref(null);
 
-const filteredProducts = computed(() => store.getters["getFilteredProducts"]);
+// const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
+const isFiltering = computed(()=>store.getters['isFiltering'])
 
 async function getProducts() {
-  if (filteredProducts.value > 0) {
+  if (isFiltering.value) {
     return products.value = computed(() => store.getters["getFilteredProducts"]).value
   } else {
-    console.log("Actual products");
     return (products.value = computed(() => store.getters["getProducts"]).value);
   }
 }

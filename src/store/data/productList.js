@@ -29,7 +29,7 @@ export default [
     },
     {
       id: 5,
-      name: "LENOVO TAB M10 2nd Gen 10.1\"",
+      name: "LENOVO TAB M10 2nd Gen 10.1\" asd",
       price: 127.60,
       category: ["tablet", "office", "work"],
       image: "https://images.eprice.it/nobrand/0/lightbox/731/209639731/DAM209639731-0-fe6ea784-47ed-44d8-bb6e-f3b7a8531d75.jpg"
