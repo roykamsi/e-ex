@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from '../../config.js'
 
 export default {
   loadProducts(state, payload) {
@@ -15,7 +16,7 @@ export default {
   async signup(state, payload) {
     await axios
       .post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw",
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${config.API_KEY}`,
         {
           email: payload.email,
           password: payload.password,
@@ -34,7 +35,7 @@ export default {
   async signIn(state, payload) {
     await axios
       .post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw",
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${config.API_KEY}`,
         {
           email: payload.email,
           password: payload.password,
