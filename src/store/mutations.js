@@ -1,5 +1,8 @@
 import axios from "axios";
 import config from '../../config.js'
+import {useRouter} from 'vue-router'
+
+const router = useRouter()
 
 export default {
   loadProducts(state, payload) {
@@ -44,14 +47,15 @@ export default {
       )
       .then((res) => {
         console.log(res);
-        state.auth.isLoggedIn = true
         this.clearLog
         localStorage.setItem('userId', res.data.localId)
         localStorage.setItem("idToken", res.data.idToken);
       })
       .catch((err) => (
+        localStorage.clear(),
         state.auth.isLoggedIn = false,
-        state.auth.errorInfo = err
+        console.log(err),
+        state.auth.errorInfo = err.message
         ));
   },
   login(state, payload) {

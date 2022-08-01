@@ -42,7 +42,7 @@ const userPassword = ref("");
 let outputError = computed(() => store.getters["getError"]);
 let isLoggedIn = computed(() => store.getters['isLoggedIn'])
 
-let userToken = computed(() => store.getters["userToken"]);
+let userToken = localStorage.getItem('userId');
 let loginPayloadDispatch = store.dispatch("login", {
   userId: userToken,
   firstName: null,
@@ -58,7 +58,7 @@ async function signup() {
   });
   await loginPayloadDispatch;
   if (!outputError.value && isLoggedIn) {
-    return await router.replace("/account");
+    return await router.replace(`/account/${userToken}`);
   }
 }
 
@@ -66,11 +66,9 @@ async function signIn() {
   await store.dispatch("signIn", {
     email: userEmail.value,
     password: userPassword.value,
-  });
-  await loginPayloadDispatch;
-  if (!outputError.value && isLoggedIn) {
-    return router.replace("/account");
-  }
+    userToken: userToken,
+  }).then(console.log(await isLoggedIn.value));
+  await loginPayloadDispatch
 }
 
 function clearLog() {

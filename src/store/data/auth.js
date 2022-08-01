@@ -1,6 +1,6 @@
 export default {
   errorInfo: null,
-  isLoggedIn: true,
+  isLoggedIn: null,
   userData: {
     userId: null,
     firstName: null,

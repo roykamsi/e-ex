@@ -12,7 +12,7 @@ export default {
     return state.filters.name  || state.filters.price || state.filters.checkbox.length
   },
   isLoggedIn() {
-    return localStorage.getItem('idToken') ? true : false
+    return !!localStorage.getItem('idToken')
   },
   userToken(state) {
     return state.auth.userId
