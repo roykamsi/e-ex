@@ -10,7 +10,6 @@
           <button @click="toAccount">My account</button>
           <button @click="logout">Logout</button>
         </span>
-        <button @click="debug">Debug</button>
       </h2>
     </nav>
   </header>
@@ -25,24 +24,18 @@ const store = useStore();
 const route = useRoute();
 const router = useRouter();
 
-function debug() {
-  return isLogged.value;
-}
-
 async function toAccount() {
   const token = localStorage.getItem("userId");
   router.push(`/account/${token}`);
   route.params.aid = token;
 }
-const isLogged = computed(() => store.getters["isLoggedIn"]);
+
+const isLogged = computed(() => store.getters["isLoggedIn"])
 
 async function logout() {
-  console.log(await store.getters.isLoggedIn);
   await store.dispatch("logout");
-  await nextTick()
-  debug();
+  await nextTick();
   await router.push("/products");
-  console.log(await isLogged.value);
 }
 </script>
 

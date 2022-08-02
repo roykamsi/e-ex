@@ -40,35 +40,40 @@ const userEmail = ref("");
 const userPassword = ref("");
 
 let outputError = computed(() => store.getters["getError"]);
-let isLoggedIn = computed(() => store.getters['isLoggedIn'])
+let isLoggedIn = computed(() => store.getters["isLoggedIn"]);
 
-let userToken = localStorage.getItem('userId');
-let loginPayloadDispatch = store.dispatch("login", {
+let userToken = localStorage.getItem("userId");
+
+const loginPayload = {
   userId: userToken,
   firstName: null,
   lastName: null,
   addedProducts: [],
   removedProducts: [],
-});
+};
 
 async function signup() {
   await store.dispatch("signup", {
     email: userEmail.value,
     password: userPassword.value,
   });
-  await loginPayloadDispatch;
+  await store.dispatch("login", loginPayload);
   if (!outputError.value && isLoggedIn) {
     return await router.replace(`/account/${userToken}`);
   }
 }
 
 async function signIn() {
-  await store.dispatch("signIn", {
-    email: userEmail.value,
-    password: userPassword.value,
-    userToken: userToken,
-  }).then(console.log(await isLoggedIn.value));
-  await loginPayloadDispatch
+  await store
+    .dispatch("signIn", {
+      email: userEmail.value,
+      password: userPassword.value,
+      userToken: userToken,
+    })
+  await store.dispatch("login", loginPayload);
+  if (!outputError.value && isLoggedIn) {
+    return await router.replace(`/products`);
+  }
 }
 
 function clearLog() {

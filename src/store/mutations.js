@@ -46,8 +46,8 @@ export default {
         }
       )
       .then((res) => {
-        console.log(res);
         this.clearLog
+        state.auth.isLogged = true
         localStorage.setItem('userId', res.data.localId)
         localStorage.setItem("idToken", res.data.idToken);
       })
