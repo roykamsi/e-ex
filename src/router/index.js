@@ -26,7 +26,7 @@ const router = createRouter({
       component: LoginPage,
     },
     {
-      path: "/account",
+      path: "/account/:uid",
       name: "Account",
       component: AccountPage,
     },

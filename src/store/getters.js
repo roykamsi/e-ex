@@ -11,8 +11,8 @@ export default {
   isFiltering(state) {
     return state.filters.name  || state.filters.price || state.filters.checkbox.length
   },
-  isLoggedIn() {
-    return localStorage.getItem('idToken') ? true : false
+  isLoggedIn(state) {
+    return state.auth.isLoggedIn || localStorage.getItem('idToken')
   },
   userToken(state) {
     return state.auth.userId

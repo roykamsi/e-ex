@@ -6,16 +6,17 @@
       </h1>
       <h2>
         <router-link v-if="!isLogged" to="/login">Login</router-link>
-        <button v-if="isLogged" @click="toAccount">My account</button>
-        <button v-if="isLogged" @click="logout">Logout</button>
-        <button @click="checkLog">Debug</button>
+        <span v-else>
+          <button @click="toAccount">My account</button>
+          <button @click="logout">Logout</button>
+        </span>
       </h2>
     </nav>
   </header>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, nextTick } from "vue";
 import { useStore } from "vuex";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
@@ -23,19 +24,18 @@ const store = useStore();
 const route = useRoute();
 const router = useRouter();
 
-const isLogged = computed(() => store.getters['isLoggedIn']);
-
-
 async function toAccount() {
-  const token = await store.getters["userToken"];
+  const token = localStorage.getItem("userId");
   router.push(`/account/${token}`);
   route.params.aid = token;
 }
 
+const isLogged = computed(() => store.getters["isLoggedIn"])
+
 async function logout() {
   await store.dispatch("logout");
-  console.log(isLogged.value, store.getters["isLoggedIn"]);
-  router.push("/products");
+  await nextTick();
+  await router.push("/products");
 }
 </script>
 
