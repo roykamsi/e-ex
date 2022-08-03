@@ -7,7 +7,8 @@
       <h2>
         <router-link v-if="!isLogged" to="/login">Login</router-link>
         <span v-else>
-          <button @click="toAccount">My account</button>
+          <button @click="toPersonalStore">Store</button>
+          <button @click="toAccount">Account</button>
           <button @click="logout">Logout</button>
         </span>
       </h2>
@@ -24,10 +25,14 @@ const store = useStore();
 const route = useRoute();
 const router = useRouter();
 
-async function toAccount() {
+function toAccount() {
   const token = localStorage.getItem("userId");
   router.push(`/account/${token}`);
   route.params.aid = token;
+}
+
+function toPersonalStore() {
+  router.push('/mystore')
 }
 
 const isLogged = computed(() => store.getters["isLoggedIn"])

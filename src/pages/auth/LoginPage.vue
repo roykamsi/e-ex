@@ -30,17 +30,17 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const store = useStore();
-const route = useRoute();
 const router = useRouter();
 
 const userEmail = ref("");
 const userPassword = ref("");
+const debugInput = ref(null);
 
-let outputError = computed(() => store.getters["getError"]);
-let isLoggedIn = computed(() => store.getters["isLoggedIn"]);
+const outputError = computed(() => store.getters["getError"]);
+const isLoggedIn = computed(() => store.getters["isLoggedIn"]);
 
 let userToken = localStorage.getItem("userId");
 
@@ -56,25 +56,30 @@ async function signup() {
   await store.dispatch("signup", {
     email: userEmail.value,
     password: userPassword.value,
+    userId: userToken
   });
-  await store.dispatch("login", loginPayload);
-  if (!outputError.value && isLoggedIn) {
+  if (!outputError.value && isLoggedIn.value) {
     return await router.replace(`/account/${userToken}`);
   }
 }
 
 async function signIn() {
-  await store
-    .dispatch("signIn", {
+  try {
+    await store.dispatch("signIn", {
       email: userEmail.value,
       password: userPassword.value,
       userToken: userToken,
-    })
-  await store.dispatch("login", loginPayload);
-  if (!outputError.value && isLoggedIn) {
-    return await router.replace(`/products`);
+    });
+    router.replace(`/products`);
+  } catch {
+    throw console.log("Something went wrong");
   }
 }
+
+// function debug() {
+//   console.log(isLoggedIn.value)
+//   }
+//   setInterval(debug, 1500);
 
 function clearLog() {
   store.dispatch("clearLog");

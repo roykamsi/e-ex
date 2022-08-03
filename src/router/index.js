@@ -3,6 +3,7 @@ import ProductList from "../pages/productsPage/ProductList.vue";
 import ProductElement from "../components/productsPage/ProductElement.vue";
 import LoginPage from "../pages/auth/LoginPage.vue";
 import AccountPage from "../pages/auth/AccountPage.vue";
+import UserPage from "../pages/userPage/UserPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,6 +31,7 @@ const router = createRouter({
       name: "Account",
       component: AccountPage,
     },
+    {path: '/mystore', name: 'personal account', component: UserPage}
   ],
 });
 
