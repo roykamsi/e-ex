@@ -32,6 +32,10 @@ export default {
     state.auth.userData.userId = payload.userId
     state.auth.errorInfo = payload.errorInfo
   },
+  addProduct(state, payload) {
+    payload.userId = state.auth.userData.userId || localStorage.getItem('userId')
+    state.auth.addedProducts = payload.addedProduct
+  },
   logout(state) {
     state.auth.isLoggedIn = false
     localStorage.clear();

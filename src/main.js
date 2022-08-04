@@ -1,22 +1,25 @@
 import base from './style/base.css'
+import vueTags from './style/vue-tags.css'
+import config from '../config.js'
+import jQuery from 'jquery'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import config from '../config.js'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store/index.js'
 import BaseCard from './components/layout/UI/BaseCard.vue'
+import VueTagsInput from '@sipec/vue3-tags-input'
 
 const app = createApp(App)
 
 
+app.use(jQuery)
 app.use(router)
 app.use(store)
 app.use(VueAxios, axios)
-app.use(base)
-app.use(config)
 
 app.component("BaseCard", BaseCard)
+app.component("VueTagsInput", VueTagsInput)
 
 app.mount('#app')

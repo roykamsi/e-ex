@@ -75,6 +75,21 @@ export default {
       console.log("error occurred");
     }
   },
+  addProduct({ commit }, payload) {
+    axios
+      .get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
+      )
+      .then((res) => {
+        if (res.data.userId === payload.userId) {
+          axios.post(
+            `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json`,
+            { addedProducts: payload.addedProduct }
+          );
+          commit("addProduct", payload.addedProduct);
+        }
+      });
+  },
   logout({ commit }) {
     commit("logout");
   },

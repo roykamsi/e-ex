@@ -1,0 +1,15 @@
+.vue-tags-input {
+  margin: 0.6rem auto;
+}
+.vue-tags-input .ti-new-tag-input {
+  border: 1px solid red;
+  background: transparent;
+}
+.vue-tags-input .ti-input {
+  border-radius: 9px;
+  border: 1px solid red !important;
+  /* outline: auto; */
+  border: none;
+  padding: 4px 10px;
+  transition: border-bottom 200ms ease;
+}
