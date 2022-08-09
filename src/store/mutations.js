@@ -1,10 +1,9 @@
-import axios from "axios";
-import config from '../../config.js'
 
 export default {
-  loadProducts(state, payload) {
-    state.getters[("getProducts", payload)];
-  },
+  addProductsToLocal(state, payload) {
+    state.products = payload.reqProds
+  }
+  ,
   setFilters(state, payload) {
     state.filters.name = payload.name;
     state.filters.price = payload.price;
@@ -32,9 +31,8 @@ export default {
     state.auth.userData.userId = payload.userId
     state.auth.errorInfo = payload.errorInfo
   },
-  addProduct(state, payload) {
-    payload.userId = state.auth.userData.userId || localStorage.getItem('userId')
-    state.auth.addedProducts = payload.addedProduct
+  updateProducts(state, payload) {
+    state.products.push(payload)
   },
   logout(state) {
     state.auth.isLoggedIn = false

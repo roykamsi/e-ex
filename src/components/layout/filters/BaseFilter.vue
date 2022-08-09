@@ -55,7 +55,7 @@ let selectAll = ref(false);
 const catArray = ref([]);
 let products = computed(function () {
   return store.getters.getProducts;
-}).value;
+}).value.filter(el => el !== undefined);
 
 for (const prod of products) {
   catArray.value.push(prod.category);

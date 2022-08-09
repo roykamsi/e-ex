@@ -3,7 +3,6 @@
     <h1>My personal account</h1>
     <h2>Added products</h2>
     <p>{{ errorInfo }}</p>
-    <button type="button" @click="sendRequest">Send request</button>
     <form @submit.prevent>
       <p>
         <label for="prodName">Product name</label>
@@ -17,8 +16,8 @@
         <label>Product name</label>
         <vue-tags-input
           v-model="tag"
-          :tags="prodTags"
-          @tags-changed="(newTags) => (tags = newTags)"
+          :tags="prodTagsRaw"
+          @tags-changed="(newTags) => (prodTagsRaw = newTags)"
           class="tag-input"
         />
       </p>
@@ -39,27 +38,22 @@ const store = useStore();
 const errorInfo = computed(() => store.getters.getError);
 const userId = localStorage.getItem("userId");
 const userProducts = computed(() => store.getters("getAddedProducts"));
-const addedProducts = ref([]);
-const prodTags = ref([]);
+const prodTagsRaw = ref([]);
+const prodTags = ref([])
 const tag = ref("");
 const prodName = ref("");
 const prodPrice = ref(0);
 
-function sendRequest() {
-  store.dispatch("sendRequest", {
+async function addProduct() {
+  prodTagsRaw.value.forEach(el => prodTags.value.push(el.text))
+  console.log(prodTags.value);
+  await store.dispatch("addProduct", {
     userId: userId,
-  });
-}
-
-function addProduct() {
-  addedProducts.value.push({
     prodName: prodName.value,
     prodPrice: prodPrice.value,
     prodTags: prodTags.value,
   });
-  store.dispatch("addProduct", {
-    addedProducts: addedProducts.value,
-  });
+  await store.dispatch("fetchProducts", { userId, errorInfo: errorInfo.value });
 }
 
 store.dispatch("getUserData", {

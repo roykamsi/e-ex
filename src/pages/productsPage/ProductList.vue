@@ -5,7 +5,9 @@
     </aside>
     <section>
       <h2>Product List</h2>
-      <h1 v-if="products.length === 0">No products found, try setting filters.</h1>
+      <h1 v-if="products.length === 0">
+        No products found, try setting filters.
+      </h1>
       <div v-else>
         <product-element
           v-for="product in products"
@@ -13,7 +15,7 @@
           :pid="product.id"
           :pname="product.name"
           :pprice="product.price"
-          :pcategory="product.category"
+          :pcategory="product.category || product.category.text"
         />
       </div>
     </section>
@@ -21,11 +23,12 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ProductElement from "../../components/productsPage/ProductElement.vue";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
+import axios from "axios";
 
 const store = useStore();
 useRoute();
@@ -33,21 +36,29 @@ useRouter();
 let products = ref(null);
 
 // const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
-const isFiltering = computed(()=>store.getters['isFiltering'])
+const isFiltering = computed(() => store.getters["isFiltering"]);
+const errorInfo = computed(() => store.getters.getError);
+const userId = localStorage.getItem("userId");
 
 async function getProducts() {
+  let prods = computed(() => store.getters["getProducts"]).value;
+  store.dispatch("loadProducts");
+  console.log(store.getters["getProducts"]);
   if (isFiltering.value) {
-    return products.value = computed(() => store.getters["getFilteredProducts"]).value
+    return (products.value = computed(
+      () => store.getters["getFilteredProducts"]
+    ).value);
   } else {
-    return (products.value = computed(() => store.getters["getProducts"]).value);
+    return (products.value = computed(
+      () => store.getters["getProducts"]
+    ).value.filter((el) => el !== undefined));
   }
 }
-getProducts() // IIFE
+getProducts(); // IIFE
 
 function updateProductList() {
   return getProducts();
 }
-
 </script>
 
 <style lang="scss" scoped>
