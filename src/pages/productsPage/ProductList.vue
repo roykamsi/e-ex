@@ -6,7 +6,7 @@
     <section>
       <h2>Product List</h2>
       <h1 v-if="products.length === 0">
-        No products found, try setting filters.
+        No products yet.
       </h1>
       <div v-else>
         <product-element
@@ -29,32 +29,30 @@ import { useStore } from "vuex";
 import ProductElement from "../../components/productsPage/ProductElement.vue";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 import axios from "axios";
+import { createDOMCompilerError } from "@vue/compiler-dom";
 
 const store = useStore();
 useRoute();
 useRouter();
-let products = ref(null);
+let products = computed(() => store.getters["getProducts"]);
 
 // const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
 const isFiltering = computed(() => store.getters["isFiltering"]);
 const errorInfo = computed(() => store.getters.getError);
 const userId = localStorage.getItem("userId");
 
+  store.dispatch("loadProducts")
+  
 async function getProducts() {
-  let prods = computed(() => store.getters["getProducts"]).value;
-  store.dispatch("loadProducts");
-  console.log(store.getters["getProducts"]);
   if (isFiltering.value) {
     return (products.value = computed(
       () => store.getters["getFilteredProducts"]
     ).value);
   } else {
-    return (products.value = computed(
-      () => store.getters["getProducts"]
-    ).value.filter((el) => el !== undefined));
+    return (products.value.filter((el) => el !== undefined));
   }
 }
-getProducts(); // IIFE
+// getProducts(); // IIFE
 
 function updateProductList() {
   return getProducts();

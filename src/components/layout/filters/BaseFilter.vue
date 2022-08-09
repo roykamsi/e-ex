@@ -53,9 +53,14 @@ let selectAll = ref(false);
 
 // GETTING EACH ARRAY
 const catArray = ref([]);
-let products = computed(function () {
-  return store.getters.getProducts;
-}).value.filter(el => el !== undefined);
+let getProducts = computed(()=>store.getters['getProducts']);
+let filterUndefinedProducts = getProducts.value.filter(el => el !== undefined)
+
+let products = filterUndefinedProducts
+
+function showConsoleLog() {
+  console.log(getProducts.value);
+} showConsoleLog()
 
 for (const prod of products) {
   catArray.value.push(prod.category);
