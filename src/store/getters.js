@@ -2,9 +2,6 @@ export default {
   getProducts(state) {
     return state.products;
   },
-  getCatMerged(state) {
-    return state.filters.catMerged;
-  },
   getFilters(state) {
     return state.filters
   },

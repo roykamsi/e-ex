@@ -46,20 +46,29 @@ const store = useStore();
 const emit = defineEmits(["updateProds"]);
 // const getFilteredProducts = store.getters.filteredProducts;
 
-let products = computed(() => store.getters["getProducts"]);
 let fName = ref("");
 let fPrice = ref(+1000);
 let fCheckbox = ref([]);
 let selectAll = ref(false);
-let catMerged = computed(() => store.getters["catMerged"]);
 
+// GETTING EACH ARRAY
+const catArray = ref([]);
+let getProducts = computed(()=>store.getters['getProducts']);
+let filterUndefinedProducts = getProducts.value.filter(el => el !== undefined)
 
-const test = setInterval(() => {
-  console.log(products.value);
-}, 2000);
-setTimeout(() => {
-  clearInterval(test)
-}, 16000);
+let products = filterUndefinedProducts
+
+function showConsoleLog() {
+  console.log(getProducts.value);
+} showConsoleLog()
+
+for (const prod of products) {
+  catArray.value.push(prod.category);
+}
+// FLATTING IT
+const catFlat = computed(() => catArray.value.flat(1));
+// UNITING IT
+const catMerged = computed(() => [...new Set(catFlat.value)]);
 
 // TRANSFERRING TO STORE MANAGER
 watch(
@@ -84,14 +93,41 @@ watch(
 // const fName = computed(()=>filter.name)
 // const fPrice = computed(()=>filter.price)
 // const fCheckbox = computed(()=>filter.checkbox)
-store.dispatch("filterProducts", {
-  fName: fName.value,
-  fPrice: fPrice.value,
-  fCheckbox: fCheckbox.value,
-  selectAll: selectAll.value,
-});
 
-emit("updateProds");
+// FILTERING SYSTEM
+
+function allTrue() {
+  let selectionData = ref(catMerged); //This is the array to be added
+  selectAll.value = !selectAll.value;
+  if (selectAll.value) {
+    return selectionData.value.forEach((item) => fCheckbox.value.push(item));
+  } else {
+    return (fCheckbox.value.length = 0);
+  }
+}
+
+async function setFilter() {
+  const filtered = await products.filter((prod) => {
+    // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
+    if (fCheckbox.value === undefined || fCheckbox.value.length === 0 && fName.value.length === 0) {
+      allTrue()
+      return prod.price <= fPrice.value;
+    } else if (fCheckbox.value.length > 0 && fName.value.length === 0 || fName.value === undefined) {
+      return (
+        prod.price <= fPrice.value &&
+        prod.category.some((v) => fCheckbox.value.some((c) => v === c))
+      );
+    } else if(fName.value.length > 0 || fCheckbox.value.length > 0) {
+      return (
+        prod.price <= fPrice.value &&
+        prod.category.some((v) => fCheckbox.value.some((c) => v === c)) &&
+        prod.name.toLowerCase().includes(fName.value)
+      );
+    }
+  });
+  store.commit("loadFilteredProducts", filtered);
+  emit("updateProds");
+}
 </script>
 
 <style lang="scss" scoped>
