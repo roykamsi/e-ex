@@ -53,6 +53,14 @@ let fCheckbox = ref([]);
 let selectAll = ref(false);
 let catMerged = computed(() => store.getters["catMerged"]);
 
+
+const test = setInterval(() => {
+  console.log(products.value);
+}, 2000);
+setTimeout(() => {
+  clearInterval(test)
+}, 16000);
+
 // TRANSFERRING TO STORE MANAGER
 watch(
   () => fName.value,
@@ -77,7 +85,6 @@ watch(
 // const fPrice = computed(()=>filter.price)
 // const fCheckbox = computed(()=>filter.checkbox)
 store.dispatch("filterProducts", {
-  products: products.value,
   fName: fName.value,
   fPrice: fPrice.value,
   fCheckbox: fCheckbox.value,

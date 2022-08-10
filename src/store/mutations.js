@@ -8,11 +8,10 @@ export default {
     state.filters.checkbox = payload.checkbox;
   },
   filterProducts(state, payload) {
-    console.log(state.products);
-    state.filteredProducts = payload.filteredProducts
-    payload.products = state.products
-    state.filters.catArray = payload.catArray
-    state.filters.catMerged = payload.catMerged
+    payload.getProducts = state.products
+    state.filteredProducts = payload.filteredProducts;
+    state.filters.catArray = payload.catArray;
+    state.filters.catMerged = payload.catMerged;
   },
   async signup(state, payload) {
     state.auth.isLoggedIn = payload.isLoggedIn;

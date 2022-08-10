@@ -13,8 +13,8 @@ export default {
         commit("addProductsToLocal", { reqProds: reqProds });
       });
   },
-  filterProducts({ commit, state }, payload) {
-    let fName = '';
+  async filterProducts({ commit, state }, payload) {
+    let fName = "";
     payload.fName = fName;
     let fPrice = +1000;
     payload.fPrice = fPrice;
@@ -24,11 +24,16 @@ export default {
     payload.selectAll = selectAll;
 
     // GETTING EACH ARRAY
-    const catArray = state.filters.catArray;
-    let getProducts = payload.products;
-    // setInterval(()=>console.log(payload.products), 2000)
-    let filterUndefinedProducts = getProducts.filter((el) => el !== undefined);
-    
+    const catArray = await state.filters.catArray;
+    let getProducts = payload.getProducts;
+    let filterUndefinedProducts = getProducts.filter(
+      (el) => el !== undefined
+    );
+    const test = setInterval(() => console.log(getProducts), 2000);
+    setTimeout(() => {
+      clearInterval(test)
+    }, 16000);
+
     const products = filterUndefinedProducts;
 
     for (const prod of products) {
@@ -45,17 +50,14 @@ export default {
       let selectionData = catMerged; //This is the array to be added
       selectAll = !selectAll;
       if (selectAll) {
-        return selectionData.forEach((item) =>
-          fCheckbox.push(item)
-        );
+        return selectionData.forEach((item) => fCheckbox.push(item));
       } else {
         return (fCheckbox.length = 0);
       }
     }
 
-    let filteredProducts 
+    let filteredProducts;
     async function setFilter() {
-
       const filtered = await products.filter((prod) => {
         // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
         if (
@@ -79,10 +81,10 @@ export default {
             prod.name.toLowerCase().includes(fName)
           );
         }
-        filteredProducts = filtered
+        filteredProducts = filtered;
       });
     }
-    commit("filterProducts", { filteredProducts, catMerged });
+      commit("filterProducts", { filteredProducts, catMerged, getProducts });
   },
   loadFilteredProducts({ commit, payload }) {
     commit("loadFilteredProducts", payload);
