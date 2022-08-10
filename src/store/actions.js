@@ -2,14 +2,88 @@ import axios from "axios";
 import config from "../../config.js";
 
 export default {
-  loadProducts({commit}) {
-    axios.get(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`).then(res => {
-        const entries = Object.entries(res.data)
-        const reqProds = entries[0][1]
-        commit('addProductsToLocal', {reqProds})
+  loadProducts({ commit }) {
+    axios
+      .get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`
+      )
+      .then((res) => {
+        const entries = Object.entries(res.data);
+        const reqProds = entries[0][1];
+        commit("addProductsToLocal", { reqProds: reqProds });
       });
-    },
+  },
+  filterProducts({ commit, state }, payload) {
+    let fName = '';
+    payload.fName = fName;
+    let fPrice = +1000;
+    payload.fPrice = fPrice;
+    let fCheckbox = [];
+    payload.fCheckbox = fCheckbox;
+    let selectAll = false;
+    payload.selectAll = selectAll;
+
+    // GETTING EACH ARRAY
+    const catArray = state.filters.catArray;
+    let getProducts = payload.products;
+    // setInterval(()=>console.log(payload.products), 2000)
+    let filterUndefinedProducts = getProducts.filter((el) => el !== undefined);
+    
+    const products = filterUndefinedProducts;
+
+    for (const prod of products) {
+      catArray.push(prod.category);
+    }
+    // FLATTING IT
+    const catFlat = catArray.flat(1);
+    // UNITING IT
+    const catMerged = [...new Set(catFlat)];
+
+    // FILTERING SYSTEM
+
+    function allTrue() {
+      let selectionData = catMerged; //This is the array to be added
+      selectAll = !selectAll;
+      if (selectAll) {
+        return selectionData.forEach((item) =>
+          fCheckbox.push(item)
+        );
+      } else {
+        return (fCheckbox.length = 0);
+      }
+    }
+
+    let filteredProducts 
+    async function setFilter() {
+
+      const filtered = await products.filter((prod) => {
+        // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
+        if (
+          fCheckbox === undefined ||
+          (fCheckbox.length === 0 && fName.length === 0)
+        ) {
+          allTrue();
+          return prod.price <= fPrice;
+        } else if (
+          (fCheckbox.length > 0 && fName.length === 0) ||
+          fName === undefined
+        ) {
+          return (
+            prod.price <= fPrice &&
+            prod.category.some((v) => fCheckbox.some((c) => v === c))
+          );
+        } else if (fName.length > 0 || fCheckbox.length > 0) {
+          return (
+            prod.price <= fPrice &&
+            prod.category.some((v) => fCheckbox.some((c) => v === c)) &&
+            prod.name.toLowerCase().includes(fName)
+          );
+        }
+        filteredProducts = filtered
+      });
+    }
+    commit("filterProducts", { filteredProducts, catMerged });
+  },
   loadFilteredProducts({ commit, payload }) {
     commit("loadFilteredProducts", payload);
   },

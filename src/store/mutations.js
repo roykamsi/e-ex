@@ -7,11 +7,12 @@ export default {
     state.filters.price = payload.price;
     state.filters.checkbox = payload.checkbox;
   },
-  filterProducts(){
-    
-  },
-  loadFilteredProducts(state, payload) {
-    state.filteredProducts = payload;
+  filterProducts(state, payload) {
+    console.log(state.products);
+    state.filteredProducts = payload.filteredProducts
+    payload.products = state.products
+    state.filters.catArray = payload.catArray
+    state.filters.catMerged = payload.catMerged
   },
   async signup(state, payload) {
     state.auth.isLoggedIn = payload.isLoggedIn;
