@@ -2,11 +2,14 @@ export default {
   getProducts(state) {
     return state.products;
   },
+  getCategories(state) {
+    return state.filters.catMerged
+  },
+  getSelectAll(state) {
+    return state.filters.selectAll
+  },
   getFilters(state) {
     return state.filters
-  },
-  getFilteredProducts(state) {
-    return state.filteredProducts
   },
   getAddedProducts(state) {
     state.auth.addedProducts

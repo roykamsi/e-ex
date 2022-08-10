@@ -23,13 +23,11 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from "vue";
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ProductElement from "../../components/productsPage/ProductElement.vue";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
-import axios from "axios";
-import { createDOMCompilerError } from "@vue/compiler-dom";
 
 const store = useStore();
 useRoute();
@@ -38,18 +36,14 @@ let products = computed(() => store.getters["getProducts"]);
 
 // const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
 const isFiltering = computed(() => store.getters["isFiltering"]);
-const errorInfo = computed(() => store.getters.getError);
-const userId = localStorage.getItem("userId");
 
   store.dispatch("loadProducts")
   
 async function getProducts() {
   if (isFiltering.value) {
-    return (products.value = computed(
-      () => store.getters["getFilteredProducts"]
-    ).value);
+    store.dispatch('loadFilteredProducts')
   } else {
-    return (products.value.filter((el) => el !== undefined));
+    return products;
   }
 }
 // getProducts(); // IIFE

@@ -2,16 +2,46 @@ import axios from "axios";
 import config from "../../config.js";
 
 export default {
-  loadProducts({commit}) {
-    axios.get(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`).then(res => {
-        const entries = Object.entries(res.data)
-        const reqProds = entries[0][1]
-        commit('addProductsToLocal', {reqProds})
+  loadProducts({ commit }) {
+    axios
+      .get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`
+      )
+      .then((res) => {
+        const entries = Object.entries(res.data);
+        const reqProds = entries[0][1];
+        commit("addProductsToLocal", { reqProds });
+        commit("filterCategories");
       });
-    },
-  loadFilteredProducts({ commit, payload }) {
-    commit("loadFilteredProducts", payload);
+  },
+  productFilterer({ commit, state }, payload) {
+    state.filteredProducts = state.products.filter((prod) => {
+      // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
+      if (
+        payload.fCheckbox === undefined ||
+        (payload.fCheckbox.length === 0 && payload.fName.length === 0)
+      ) {
+        commit("allTrue", { fCheckbox: payload.fCheckbox });
+        return prod.price <= state.filters.fPrice;
+      } else if (
+        (payload.fCheckbox.length > 0 && payload.fName.length === 0) ||
+        payload.fName === undefined
+      ) {
+        return (
+          prod.price <= state.filters.fPrice &&
+          prod.category.some((v) => payload.fCheckbox.some((c) => v === c))
+        );
+      } else if (payload.fName.length > 0 || payload.fCheckbox.length > 0) {
+        return (
+          prod.price <= state.filters.fPrice &&
+          prod.category.some((v) => payload.fCheckbox.some((c) => v === c)) &&
+          prod.name.toLowerCase().includes(payload.fName)
+        );
+      }
+    });
+  },
+  loadFilteredProducts({ commit }) {
+    commit("loadFilteredProducts");
   },
   async signup({ commit }, payload) {
     await axios

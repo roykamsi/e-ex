@@ -1,4 +1,7 @@
 export default {
+  removeProd(state) {
+    state.products.unshift(state.products.length)
+  },
   addProductsToLocal(state, payload) {
     state.products = payload.reqProds;
   },
@@ -7,11 +10,28 @@ export default {
     state.filters.price = payload.price;
     state.filters.checkbox = payload.checkbox;
   },
-  filterProducts(){
-    
+  filterCategories(state) {
+    // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
+    for (const prod of state.products) {
+      state.filters.catArray.push(prod.category);
+    }
+    // FLATTING IT
+    state.filters.catFlat = state.filters.catArray.flat(1);
+    // UNITING IT
+    state.filters.catMerged = [...new Set(state.filters.catFlat)];
   },
-  loadFilteredProducts(state, payload) {
-    state.filteredProducts = payload;
+  allTrue(state, payload) {
+    state.filters.selectAll = !state.filters.selectAll;
+    if (state.filters.selectAll) {
+      return state.filters.catMerged.forEach((item) =>
+        payload.fCheckbox.push(item)
+      );
+    } else {
+      return (payload.fCheckbox.length = 0);
+    }
+  },
+  loadFilteredProducts(state) {
+    state.products = state.filteredProducts;
   },
   async signup(state, payload) {
     state.auth.isLoggedIn = payload.isLoggedIn;
