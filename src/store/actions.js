@@ -14,28 +14,32 @@ export default {
         commit("filterCategories");
       });
   },
-  productFilterer({ commit, state }, payload) {
+  productFilterer({ commit, state }, {fPrice, fCheckbox, fName}) {
+    fPrice = Number(fPrice) //Number to integer
     state.filteredProducts = state.products.filter((prod) => {
       // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
       if (
-        payload.fCheckbox === undefined ||
-        (payload.fCheckbox.length === 0 && payload.fName.length === 0)
+        fCheckbox === undefined ||
+        (fCheckbox.length === 0 && fName.length === 0)
       ) {
-        commit("allTrue", { fCheckbox: payload.fCheckbox });
-        return prod.price <= state.filters.fPrice;
+        console.log('allTrue');
+        commit("allTrue", { fCheckbox: fCheckbox }); //ACTIVATE ALL CHECKBOXES TO SEARCH GLOBAL
+        return prod.price <= fPrice;
       } else if (
-        (payload.fCheckbox.length > 0 && payload.fName.length === 0) ||
-        payload.fName === undefined
+        (fCheckbox.length > 0 && fName.length === 0) ||
+        fName === undefined
       ) {
+        console.table('filtering by price', prod.price, fPrice);
         return (
-          prod.price <= state.filters.fPrice &&
-          prod.category.some((v) => payload.fCheckbox.some((c) => v === c))
+          prod.price <= fPrice &&
+          prod.category.some((v) => fCheckbox.some((c) => v === c))
         );
-      } else if (payload.fName.length > 0 || payload.fCheckbox.length > 0) {
+      } else if (fName.length > 0 || fCheckbox.length > 0) {
+        console.log('filtering by name');
         return (
-          prod.price <= state.filters.fPrice &&
-          prod.category.some((v) => payload.fCheckbox.some((c) => v === c)) &&
-          prod.name.toLowerCase().includes(payload.fName)
+          prod.price <= fPrice &&
+          prod.category.some((v) => fCheckbox.some((c) => v === c)) &&
+          prod.name.toLowerCase().includes(fName)
         );
       }
     });

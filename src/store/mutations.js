@@ -1,6 +1,7 @@
 export default {
   removeProd(state) {
-    state.products.unshift(state.products.length)
+    state.products = state.products.slice(-4, -1)
+    console.log(state.products);
   },
   addProductsToLocal(state, payload) {
     state.products = payload.reqProds;

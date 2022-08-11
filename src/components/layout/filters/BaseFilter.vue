@@ -110,8 +110,10 @@ async function setFilter() {
     fCheckbox: fCheckbox.value,
     fPrice: fPrice.value,
   });
-  emit("updateProds");
-}
+  store.dispatch('loadFilteredProducts')
+  emit("updateProds")
+  console.log(products.value);
+  }
 </script>
 
 <style lang="scss" scoped>
