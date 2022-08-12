@@ -3,7 +3,7 @@ export default {
     return state.products;
   },
   getFilteredProducts(state) {
-    return state.filteredProducts
+    return state.filteredProducts;
   },
   getCategories(state) {
     return state.filters.catMerged;
@@ -12,18 +12,17 @@ export default {
     return state.filters.selectAll;
   },
   getFilterData(state) {
-    let fName = state.filters.fName
-    let fPrice = state.filters.fPrice
-    let fCheckbox = state.filters.fCheckbox
+    let fName = state.filters.fName;
+    let fPrice = state.filters.fPrice;
+    let fCheckbox = state.filters.fCheckbox;
 
     fPrice = Number(fPrice); //Number to integer
     // FOR TESTING **********************
     // state.filteredProducts = state.products
-    // .filter(prod => 
+    // .filter(prod =>
     //   prod.price <= fPrice
     //   )
     // ***********************
-    console.log('State products:', state.products, 'Filtering price: ', fPrice);
 
     state.filteredProducts = state.products.filter((prod) => {
       // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
@@ -32,7 +31,6 @@ export default {
         (fCheckbox.length === 0 && fName.length === 0)
       ) {
         console.log("allTrue");
-        // commit("allTrue", { fCheckbox: fCheckbox }); //ACTIVATE ALL CHECKBOXES TO SEARCH GLOBAL
         return prod.price <= fPrice;
       } else if (
         (fCheckbox.length > 0 && fName.length === 0) ||
@@ -58,12 +56,16 @@ export default {
   getAddedProducts(state) {
     state.auth.addedProducts;
   },
-  isFiltering(state) {
-    return (
+  getProductsOrFilteredProducts(state) {
+    if (
       state.filters.fName ||
       state.filters.fPrice ||
       state.filters.fCheckbox.length
-    );
+    ) {
+      return state.filteredProducts;
+    } else {
+      return state.products;
+    }
   },
   isLoggedIn(state) {
     return state.auth.isLoggedIn || localStorage.getItem("idToken");

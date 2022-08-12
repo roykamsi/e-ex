@@ -1,8 +1,4 @@
 export default {
-  removeProd(state) {
-    state.products = state.products.slice(-4, -1)
-    console.log(state.products);
-  },
   addProductsToLocal(state, payload) {
     state.products = payload.reqProds;
   },
@@ -17,7 +13,7 @@ export default {
     state.filters.catMerged = [...new Set(state.filters.catFlat)];
   },
   allTrue(state, payload) {
-    state.filters.selectAll = !state.filters.selectAll;
+    state.filters.selectAll = !state.filters.selectAll; // Toggling filtering feature
     if (state.filters.selectAll) {
       return state.filters.catMerged.forEach((item) =>
         payload.fCheckbox.push(item)
@@ -27,8 +23,6 @@ export default {
     }
   },
   loadFilteredProducts(state) {
-    const preservedProducts = state.products.slice(0)
-    console.log(preservedProducts);
     state.products = state.filteredProducts;
   },
   async signup(state, payload) {

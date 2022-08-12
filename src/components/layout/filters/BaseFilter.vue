@@ -3,7 +3,6 @@
     <h2>Filter products</h2>
     <div>
       <label for="name">By name</label>
-      <button @click="removeProd">Remove 1 product</button>
       <input type="text" id="name" v-model.trim="fName" />
     </div>
     <div>
@@ -51,7 +50,6 @@ let fPrice = ref(+1000);
 let fCheckbox = ref([]);
 
 const catMerged = computed(() => store.getters["getCategories"]); // Showing categories
-let products = computed(() => store.getters["getProducts"]);
 let selectAll = computed(() => store.getters["getSelectAll"]);
 
 // TESTING AREA 🧪 //
@@ -77,27 +75,26 @@ let selectAll = computed(() => store.getters["getSelectAll"]);
 // const fPrice = computed(()=>filter.price)
 // const fCheckbox = computed(()=>filter.checkbox)
 
-function removeProd() {
-  store.commit("removeProd");
-}
-
 // ******************
-
 
 // FILTERING SYSTEM
 function allTrue() {
   store.commit("allTrue", { fCheckbox: fCheckbox.value });
 }
 
+// Triggers once is starting to filter
 async function setFilter() {
   // TRANSFERRING FILTERS TO THE STORE MANAGER
   store.dispatch("setFilters", {
     fName: fName.value,
     fPrice: fPrice.value,
     fCheckbox: fCheckbox.value,
-  })
-  store.getters['getFilterData'] // Getting the filtered data back
-  // store.dispatch("loadFilteredProducts");
+  });
+  // CHECKING IF THE CAT. IS EMPTY WHILE LOOKING FOR NAME
+  if (fCheckbox.value.length === 0 && fName.value !== undefined) {
+    allTrue() //ACTIVATE ALL CHECKBOXES TO SEARCH GLOBAL
+  }
+  store.getters["getFilterData"]; // Getting the filtered data back
 }
 </script>
 
