@@ -46,7 +46,6 @@ const prodPrice = ref(0);
 
 async function addProduct() {
   prodTagsRaw.value.forEach(el => prodTags.value.push(el.text))
-  console.log(prodTags.value);
   await store.dispatch("addProduct", {
     userId: userId,
     prodName: prodName.value,
