@@ -1,13 +1,11 @@
 <template>
   <main>
     <aside>
-      <base-filter @updateProds="updateProductList"></base-filter>
+      <base-filter></base-filter>
     </aside>
     <section>
       <h2>Product List</h2>
-      <h1 v-if="products.length === 0">
-        No products yet.
-      </h1>
+      <h1 v-if="products.length === 0">No products yet.</h1>
       <div v-else>
         <product-element
           v-for="product in products"
@@ -23,7 +21,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ProductElement from "../../components/productsPage/ProductElement.vue";
@@ -32,25 +30,12 @@ import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 const store = useStore();
 useRoute();
 useRouter();
-let products = computed(() => store.getters["getProducts"]);
-
-// const filteredProducts = computed(() => store.getters["getFilteredProducts"]).value;
 const isFiltering = computed(() => store.getters["isFiltering"]);
+store.dispatch("loadProducts");
 
-  store.dispatch("loadProducts")
-  
-async function getProducts() {
-  if (isFiltering.value) {
-    store.dispatch('loadFilteredProducts')
-  } else {
-    return products;
-  }
-}
-// getProducts(); // IIFE
-
-function updateProductList() {
-  return getProducts();
-}
+let products = isFiltering.value
+  ? computed(() => store.getters["getFilteredProducts"])
+  : computed(() => store.getters["getProducts"]);
 </script>
 
 <style lang="scss" scoped>

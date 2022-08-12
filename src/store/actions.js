@@ -14,35 +14,10 @@ export default {
         commit("filterCategories");
       });
   },
-  productFilterer({ commit, state }, {fPrice, fCheckbox, fName}) {
-    fPrice = Number(fPrice) //Number to integer
-    state.filteredProducts = state.products.filter((prod) => {
-      // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
-      if (
-        fCheckbox === undefined ||
-        (fCheckbox.length === 0 && fName.length === 0)
-      ) {
-        console.log('allTrue');
-        commit("allTrue", { fCheckbox: fCheckbox }); //ACTIVATE ALL CHECKBOXES TO SEARCH GLOBAL
-        return prod.price <= fPrice;
-      } else if (
-        (fCheckbox.length > 0 && fName.length === 0) ||
-        fName === undefined
-      ) {
-        console.table('filtering by price', prod.price, fPrice);
-        return (
-          prod.price <= fPrice &&
-          prod.category.some((v) => fCheckbox.some((c) => v === c))
-        );
-      } else if (fName.length > 0 || fCheckbox.length > 0) {
-        console.log('filtering by name');
-        return (
-          prod.price <= fPrice &&
-          prod.category.some((v) => fCheckbox.some((c) => v === c)) &&
-          prod.name.toLowerCase().includes(fName)
-        );
-      }
-    });
+  setFilters({_1, state}, payload) {
+    state.filters.fName = payload.fName;
+    state.filters.fPrice = payload.fPrice;
+    state.filters.fCheckbox = payload.fCheckbox;
   },
   loadFilteredProducts({ commit }) {
     commit("loadFilteredProducts");

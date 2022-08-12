@@ -6,11 +6,6 @@ export default {
   addProductsToLocal(state, payload) {
     state.products = payload.reqProds;
   },
-  setFilters(state, payload) {
-    state.filters.name = payload.name;
-    state.filters.price = payload.price;
-    state.filters.checkbox = payload.checkbox;
-  },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
     for (const prod of state.products) {
@@ -32,6 +27,8 @@ export default {
     }
   },
   loadFilteredProducts(state) {
+    const preservedProducts = state.products.slice(0)
+    console.log(preservedProducts);
     state.products = state.filteredProducts;
   },
   async signup(state, payload) {

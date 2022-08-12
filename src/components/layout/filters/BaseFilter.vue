@@ -40,17 +40,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const emit = defineEmits(["updateProds"]);
 // const getFilteredProducts = store.getters.filteredProducts;
 
 let fName = ref("");
 let fPrice = ref(+1000);
 let fCheckbox = ref([]);
 
+const catMerged = computed(() => store.getters["getCategories"]); // Showing categories
 let products = computed(() => store.getters["getProducts"]);
 let selectAll = computed(() => store.getters["getSelectAll"]);
 
@@ -67,28 +67,6 @@ let selectAll = computed(() => store.getters["getSelectAll"]);
 //   clearInterval(test);
 // }, 6000);
 
-function removeProd() {
-  store.commit('removeProd')
-}
-
-// ***************
-
-const catMerged = computed(() => store.getters["getCategories"]);
-
-// TRANSFERRING TO STORE MANAGER
-watch(
-  () => fName.value,
-  (state) => store.commit("setFilters", { name: state })
-); // NAME
-watch(
-  () => fPrice.value,
-  (state) => store.commit("setFilters", { price: Number(state) })
-); // PRICE
-watch(
-  () => fCheckbox.value,
-  (state) => store.commit("setFilters", { checkbox: state })
-); // CHECKBOX
-
 // ASYNC UNIT TESTING //
 // setInterval(() => {
 //   console.log(store.state.filters.checkbox);
@@ -99,21 +77,28 @@ watch(
 // const fPrice = computed(()=>filter.price)
 // const fCheckbox = computed(()=>filter.checkbox)
 
+function removeProd() {
+  store.commit("removeProd");
+}
+
+// ******************
+
+
 // FILTERING SYSTEM
 function allTrue() {
-  store.commit('allTrue', {fCheckbox: fCheckbox.value})
+  store.commit("allTrue", { fCheckbox: fCheckbox.value });
 }
 
 async function setFilter() {
-  store.dispatch("productFilterer", {
+  // TRANSFERRING FILTERS TO THE STORE MANAGER
+  store.dispatch("setFilters", {
     fName: fName.value,
-    fCheckbox: fCheckbox.value,
     fPrice: fPrice.value,
-  });
-  store.dispatch('loadFilteredProducts')
-  emit("updateProds")
-  console.log(products.value);
-  }
+    fCheckbox: fCheckbox.value,
+  })
+  store.getters['getFilterData'] // Getting the filtered data back
+  // store.dispatch("loadFilteredProducts");
+}
 </script>
 
 <style lang="scss" scoped>
