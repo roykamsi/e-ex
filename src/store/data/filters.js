@@ -1,5 +1,9 @@
 export default {
-  name: '',
-  price: 0,
-  checkbox: []
+  fName: "",
+  fPrice: 0,
+  fCheckbox: [],
+  selectAll: false,
+  catArray: [],
+  catFlat: [],
+  catMerged: [],
 }

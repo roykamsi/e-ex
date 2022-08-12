@@ -37,7 +37,6 @@ const router = useRouter();
 
 const userEmail = ref("");
 const userPassword = ref("");
-const debugInput = ref(null);
 
 const outputError = computed(() => store.getters["getError"]);
 const isLoggedIn = computed(() => store.getters["isLoggedIn"]);

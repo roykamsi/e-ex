@@ -3,6 +3,7 @@
     <h2>Filter products</h2>
     <div>
       <label for="name">By name</label>
+      <button @click="removeProd">Remove 1 product</button>
       <input type="text" id="name" v-model.trim="fName" />
     </div>
     <div>
@@ -39,45 +40,32 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const emit = defineEmits(["updateProds"]);
 // const getFilteredProducts = store.getters.filteredProducts;
 
 let fName = ref("");
 let fPrice = ref(+1000);
 let fCheckbox = ref([]);
-let selectAll = ref(false);
 
-// GETTING EACH ARRAY
-const catArray = ref([]);
-let products = computed(function () {
-  return store.getters.getProducts;
-}).value;
+const catMerged = computed(() => store.getters["getCategories"]); // Showing categories
+let products = computed(() => store.getters["getProducts"]);
+let selectAll = computed(() => store.getters["getSelectAll"]);
 
-for (const prod of products) {
-  catArray.value.push(prod.category);
-}
-// FLATTING IT
-const catFlat = computed(() => catArray.value.flat(1));
-// UNITING IT
-const catMerged = computed(() => [...new Set(catFlat.value)]);
-
-// TRANSFERRING TO STORE MANAGER
-watch(
-  () => fName.value,
-  (state) => store.commit("setFilters", { name: state })
-); // NAME
-watch(
-  () => fPrice.value,
-  (state) => store.commit("setFilters", { price: Number(state) })
-); // PRICE
-watch(
-  () => fCheckbox.value,
-  (state) => store.commit("setFilters", { checkbox: state })
-); // CHECKBOX
+// TESTING AREA 🧪 //
+// ***************
+// function showConsoleLog() {
+//   console.log(products.value);
+// }
+// // TESTING AJAX REQUEST
+// const test = setInterval(() => {
+//   showConsoleLog();
+// }, 2000);
+// setTimeout(() => {
+//   clearInterval(test);
+// }, 6000);
 
 // ASYNC UNIT TESTING //
 // setInterval(() => {
@@ -89,39 +77,27 @@ watch(
 // const fPrice = computed(()=>filter.price)
 // const fCheckbox = computed(()=>filter.checkbox)
 
-// FILTERING SYSTEM
+function removeProd() {
+  store.commit("removeProd");
+}
 
+// ******************
+
+
+// FILTERING SYSTEM
 function allTrue() {
-  let selectionData = ref(catMerged); //This is the array to be added
-  selectAll.value = !selectAll.value;
-  if (selectAll.value) {
-    return selectionData.value.forEach((item) => fCheckbox.value.push(item));
-  } else {
-    return (fCheckbox.value.length = 0);
-  }
+  store.commit("allTrue", { fCheckbox: fCheckbox.value });
 }
 
 async function setFilter() {
-  const filtered = await products.filter((prod) => {
-    // CHECK IF A CHECKBOX VALUE IS INCLUDED IN THE PROD. CATEGORIES
-    if (fCheckbox.value === undefined || fCheckbox.value.length === 0 && fName.value.length === 0) {
-      allTrue()
-      return prod.price <= fPrice.value;
-    } else if (fCheckbox.value.length > 0 && fName.value.length === 0 || fName.value === undefined) {
-      return (
-        prod.price <= fPrice.value &&
-        prod.category.some((v) => fCheckbox.value.some((c) => v === c))
-      );
-    } else if(fName.value.length > 0 || fCheckbox.value.length > 0) {
-      return (
-        prod.price <= fPrice.value &&
-        prod.category.some((v) => fCheckbox.value.some((c) => v === c)) &&
-        prod.name.toLowerCase().includes(fName.value)
-      );
-    }
-  });
-  store.commit("loadFilteredProducts", filtered);
-  emit("updateProds");
+  // TRANSFERRING FILTERS TO THE STORE MANAGER
+  store.dispatch("setFilters", {
+    fName: fName.value,
+    fPrice: fPrice.value,
+    fCheckbox: fCheckbox.value,
+  })
+  store.getters['getFilterData'] // Getting the filtered data back
+  // store.dispatch("loadFilteredProducts");
 }
 </script>
 
