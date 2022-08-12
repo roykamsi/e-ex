@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import ProductElement from "../../components/productsPage/ProductElement.vue";
@@ -30,12 +30,11 @@ import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 const store = useStore();
 useRoute();
 useRouter();
-const isFiltering = computed(() => store.getters["isFiltering"]);
+// const isFiltering = computed(() => store.getters["isFiltering"]);
 store.dispatch("loadProducts");
 
-let products = isFiltering.value
-  ? computed(() => store.getters["getFilteredProducts"])
-  : computed(() => store.getters["getProducts"]);
+let products = computed(() => store.getters['getProductsOrFilteredProducts']);
+
 </script>
 
 <style lang="scss" scoped>
