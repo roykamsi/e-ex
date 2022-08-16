@@ -13,7 +13,6 @@ import VueTagsInput from '@sipec/vue3-tags-input'
 
 const app = createApp(App)
 
-
 app.use(jQuery)
 app.use(router)
 app.use(store)

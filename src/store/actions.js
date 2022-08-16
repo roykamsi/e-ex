@@ -1,5 +1,4 @@
 import axios from "axios";
-import { each } from "jquery";
 import config from "../../config.js";
 
 export default {
@@ -37,8 +36,8 @@ export default {
               const nameArr = Array.from([name, nameVal]);
               const priceArr = Array.from([price, priceVal]);
               const catArr = Array.from([category, catVal]);
-              const EACH_USER_PROD = Array.from([nameArr, priceArr, catArr, idArr]); 
-              // Above you can add more elements to the array
+              // It's possible can add more elements to the array
+              const EACH_USER_PROD = Array.from([nameArr, priceArr, catArr, idArr]);
 
               // Hate to do this s***t but I'm still a newbie :/
               const prodsIntoEntries = Object.fromEntries(EACH_USER_PROD); // Reconverting them into Objects again
@@ -131,6 +130,7 @@ export default {
     axios.post(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
       {
+        prodImage: payload.prodImage,
         prodName: payload.prodName,
         prodPrice: payload.prodPrice,
         prodTags: payload.prodTags,
