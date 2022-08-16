@@ -1,20 +1,59 @@
 import axios from "axios";
+import { each } from "jquery";
 import config from "../../config.js";
 
 export default {
-  loadProducts({ commit }) {
+  loadProducts({ commit, state }) {
+    const productsEndPoint =
+      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json";
+    const userProdsEndPoint =
+      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json";
+    const productsReq = axios.get(productsEndPoint);
+    const userProdsReq = axios.get(userProdsEndPoint);
     axios
-      .get(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`
+      .all([productsReq, userProdsReq])
+      .then(
+        axios.spread((...res) => {
+          const reqProds = Object.entries(res[0].data)[0][1];
+          const eachUser = Object.entries(res[1].data);
+          let renamedUserProds = [];
+          // Now let's transform EACH entry to match the products objects
+          // ++ this gonna be tough to understand ++
+          eachUser.forEach((user) => {
+            const [userId, addedProducts] = user;
+            const userProds = Object.entries(addedProducts.addedProducts);
+            const renameInputData = userProds.forEach((prod) => {
+              const [ eachProdId ] = prod
+              const prodId = eachProdId.slice(1, -1)
+              const eachUsrProd = Object.entries(prod[1]);
+              const idArr = ['id', prodId] // Inserting the prodId
+              let [name, nameVal] = eachUsrProd[0];
+              name = "name";
+              let [price, priceVal] = eachUsrProd[1];
+              price = "price";
+              let [category, catVal] = eachUsrProd[2];
+              category = "category";
+              // Making out an array for each of them
+              const nameArr = Array.from([name, nameVal]);
+              const priceArr = Array.from([price, priceVal]);
+              const catArr = Array.from([category, catVal]);
+              const EACH_USER_PROD = Array.from([nameArr, priceArr, catArr, idArr]); 
+              // Above you can add more elements to the array
+
+              // Hate to do this s***t but I'm still a newbie :/
+              const prodsIntoEntries = Object.fromEntries(EACH_USER_PROD); // Reconverting them into Objects again
+                    return renamedUserProds.push(prodsIntoEntries); // this is what matters
+            });
+          });
+          commit("addProductsToLocal", { reqProds, renamedUserProds });
+          commit("filterCategories");
+        })
       )
-      .then((res) => {
-        const entries = Object.entries(res.data);
-        const reqProds = entries[0][1];
-        commit("addProductsToLocal", { reqProds });
-        commit("filterCategories");
+      .catch((errors) => {
+        state.auth.errorInfo = errors.message;
       });
   },
-  setFilters({_1, state}, payload) {
+  setFilters({ _1, state }, payload) {
     state.filters.fName = payload.fName;
     state.filters.fPrice = payload.fPrice;
     state.filters.fCheckbox = payload.fCheckbox;
@@ -33,7 +72,6 @@ export default {
         }
       )
       .then((res) => {
-        console.log(res);
         this.clearLog;
         payload.isLoggedIn = true;
         localStorage.setItem("userId", res.data.localId);
@@ -107,7 +145,6 @@ export default {
       )
       .then((res) => {
         const resData = Object.entries(res.data);
-        console.log(resData);
         for (const data of resData) {
           const product = {
             id: data[0],

@@ -1,6 +1,6 @@
 export default {
-  addProductsToLocal(state, payload) {
-    state.products = payload.reqProds;
+  addProductsToLocal(state, {reqProds, renamedUserProds}) {
+    state.products = reqProds.concat(renamedUserProds);
   },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
