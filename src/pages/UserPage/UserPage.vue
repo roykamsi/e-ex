@@ -53,7 +53,8 @@ const prodPrice = ref(0);
 function uploadImage(e) {
   if (!e.target.files.length) return;
   const file = e.target.files[0];
-  // const storageRef = firebaseApp.storage().ref();
+  console.log(fbStorage);
+  const storageRef = fbStorage;
   const fileRef = storageRef.child(file.name);
   fileRef.put(file).then(() => {
     console.log("File uploaded", file.name);
