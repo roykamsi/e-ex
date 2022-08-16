@@ -13,8 +13,7 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
+const fbStorage = getStorage(firebaseApp)
+const storageRef = ref(fbStorage, 'images')
 
-const storage = getStorage(firebaseApp);
-const storageRef = ref(storage)
-
-export { firebaseApp, storage, storageRef };
+export { firebaseApp, fbStorage, storageRef};

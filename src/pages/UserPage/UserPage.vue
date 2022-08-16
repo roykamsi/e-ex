@@ -5,6 +5,10 @@
     <p>{{ errorInfo }}</p>
     <form @submit.prevent>
       <p>
+        <label for="uploadImage">Upload Image</label>
+        <input type="file" id="uploadImage" @change="uploadImage" />
+      </p>
+      <p>
         <label for="prodName">Product name</label>
         <input type="text" id="prodName" v-model="prodName" />
       </p>
@@ -30,8 +34,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from "@vue/runtime-core";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import { fbStorage, firebaseApp } from "../../firebaseInit";
 
 const store = useStore();
 
@@ -39,13 +44,24 @@ const errorInfo = computed(() => store.getters.getError);
 const userId = localStorage.getItem("userId");
 const userProducts = computed(() => store.getters("getAddedProducts"));
 const prodTagsRaw = ref([]);
-const prodTags = ref([])
+const prodTags = ref([]);
 const tag = ref("");
 const prodName = ref("");
 const prodPrice = ref(0);
 
+// IMAGE UPLOADING
+function uploadImage(e) {
+  if (!e.target.files.length) return;
+  const file = e.target.files[0];
+  // const storageRef = firebaseApp.storage().ref();
+  const fileRef = storageRef.child(file.name);
+  fileRef.put(file).then(() => {
+    console.log("File uploaded", file.name);
+  });
+}
+
 async function addProduct() {
-  prodTagsRaw.value.forEach(el => prodTags.value.push(el.text))
+  prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   await store.dispatch("addProduct", {
     userId: userId,
     prodName: prodName.value,
