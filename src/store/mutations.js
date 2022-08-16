@@ -1,5 +1,7 @@
+import { fbStorage, uploadBytes, ref } from "../firebaseInit.js";
+
 export default {
-  addProductsToLocal(state, {reqProds, renamedUserProds}) {
+  addProductsToLocal(state, { reqProds, renamedUserProds }) {
     state.products = reqProds.concat(renamedUserProds);
   },
   filterCategories(state) {
@@ -46,6 +48,24 @@ export default {
   },
   updateProducts(state, payload) {
     state.products.push(payload);
+  },
+  uploadImage(state, { image }) {
+    const meta = {
+      contentType: "image",
+    };
+    const getRef = ref(fbStorage, image);
+
+    if (getRef.name.toLowerCase().includes("jpg" || "jpeg" || "png")) {
+      uploadBytes(getRef, image, meta)
+        .then((snapshot) => {
+          console.log("File uploaded", snapshot);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      state.auth.errorInfo = "Upload error, try selecting an image.";
+    }
   },
   logout(state) {
     state.auth.isLoggedIn = false;

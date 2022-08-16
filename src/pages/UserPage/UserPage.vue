@@ -25,7 +25,8 @@
           class="tag-input"
         />
       </p>
-      <button type="submit" @click="addProduct">Add product</button>
+      <p v-if="errorInfo" class="error">{{ errorInfo }}</p>
+      <p><button type="submit" @click="addProduct">Add product</button></p>
     </form>
     <ul>
       <!-- <li v-for="usrProd in userProducts" :key="usrProd.id"></li> -->
@@ -53,11 +54,9 @@ const prodPrice = ref(0);
 function uploadImage(e) {
   if (!e.target.files.length) return;
   const file = e.target.files[0];
-  console.log(fbStorage);
-  const storageRef = fbStorage;
-  const fileRef = storageRef.child(file.name);
-  fileRef.put(file).then(() => {
-    console.log("File uploaded", file.name);
+  console.log(file);
+  store.commit("uploadImage", {
+    image: `images/${file.name}`,
   });
 }
 
