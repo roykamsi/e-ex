@@ -12,6 +12,7 @@
             Price: {{pprice}} $
           </p>
         </div>
+        
       </base-card>
 </template>
 

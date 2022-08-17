@@ -24,7 +24,6 @@
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import ProductElement from "../../components/productsPage/ProductElement.vue";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 
 const store = useStore();
@@ -55,7 +54,6 @@ section > div {
 div {
   margin: 0 auto;
   width: 100%;
-  max-width: 70vw;
 }
 aside {
   display: flex;

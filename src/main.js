@@ -10,6 +10,8 @@ import router from './router'
 import store from './store/index.js'
 import BaseCard from './components/layout/UI/BaseCard.vue'
 import VueTagsInput from '@sipec/vue3-tags-input'
+import ProductElement from "./components/productsPage/ProductElement.vue";
+import ItemsGridder from './components/productsPage/ItemsGridder.vue'
 
 const app = createApp(App)
 
@@ -21,5 +23,7 @@ app.use(VueAxios, axios)
 
 app.component("BaseCard", BaseCard)
 app.component("VueTagsInput", VueTagsInput)
+app.component('ProductElement', ProductElement)
+app.component('ItemsGridder', ItemsGridder)
 
 app.mount('#app')

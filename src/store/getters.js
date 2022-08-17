@@ -2,6 +2,9 @@ export default {
   getProducts(state) {
     return state.products;
   },
+  getUserProducts(state) {
+    return state.auth.userData.addedProducts
+  },
   getFilteredProducts(state) {
     return state.filteredProducts;
   },

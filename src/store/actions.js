@@ -1,5 +1,4 @@
 import axios from "axios";
-import { each } from "jquery";
 import config from "../../config.js";
 
 export default {
@@ -23,10 +22,10 @@ export default {
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
             const renameInputData = userProds.forEach((prod) => {
-              const [ eachProdId ] = prod
-              const prodId = eachProdId.slice(1, -1)
+              const [eachProdId] = prod;
+              const prodId = eachProdId.slice(1, -1);
               const eachUsrProd = Object.entries(prod[1]);
-              const idArr = ['id', prodId] // Inserting the prodId
+              const idArr = ["id", prodId]; // Inserting the prodId
               let [name, nameVal] = eachUsrProd[0];
               name = "name";
               let [price, priceVal] = eachUsrProd[1];
@@ -37,12 +36,17 @@ export default {
               const nameArr = Array.from([name, nameVal]);
               const priceArr = Array.from([price, priceVal]);
               const catArr = Array.from([category, catVal]);
-              const EACH_USER_PROD = Array.from([nameArr, priceArr, catArr, idArr]); 
+              const EACH_USER_PROD = Array.from([
+                nameArr,
+                priceArr,
+                catArr,
+                idArr,
+              ]);
               // Above you can add more elements to the array
 
               // Hate to do this s***t but I'm still a newbie :/
               const prodsIntoEntries = Object.fromEntries(EACH_USER_PROD); // Reconverting them into Objects again
-                    return renamedUserProds.push(prodsIntoEntries); // this is what matters
+              return renamedUserProds.push(prodsIntoEntries); // this is what matters
             });
           });
           commit("addProductsToLocal", { reqProds, renamedUserProds });
@@ -138,12 +142,43 @@ export default {
     );
     // commit("addProduct", payload.addedProduct);
   },
-  fetchProducts({ commit }, payload) {
+  fetchProducts({ commit, state }, payload) {
     axios
       .get(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
       )
       .then((res) => {
+        const userId = payload.userId;
+        const resData = Object.entries(res.data);
+        for (const data of resData) {
+          if (data[0] === userId) {
+            const eachProduct = Object.entries(data[1].addedProducts);
+            let products = []
+            eachProduct.forEach((prod) => {
+              const product = {
+                id: prod[0],
+                name: prod[1].prodName,
+                price: prod[1].prodPrice,
+                category: prod[1].prodTags,
+              };
+              products.push(product)
+            });
+            state.auth.userData.addedProducts = products
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return (err.message = payload.errorInfo);
+      });
+  },
+  addAndUpdateUserProducts({ commit }, payload) {
+    axios
+      .get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
+      )
+      .then((res) => {
+        const userId = payload.userId;
         const resData = Object.entries(res.data);
         for (const data of resData) {
           const product = {

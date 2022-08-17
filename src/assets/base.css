@@ -139,10 +139,3 @@ a, li {
 a:active, a:hover {
   color: var(--secondary)
 }
-.error {
-  display: inline-block;
-  color: var(--secondary);
-  margin: .5rem auto;
-  padding: 1rem;
-  outline: 1px solid var(--secondary);
-}

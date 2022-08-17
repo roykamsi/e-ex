@@ -2,6 +2,7 @@
 import { RouterView } from "vue-router";
 import TheHeader from "./components/layout/TheHeader.vue";
 import { firebaseApp, fbStorage, uploadBytes, ref } from "./firebaseInit.js";
+
 </script>
 
 <template>

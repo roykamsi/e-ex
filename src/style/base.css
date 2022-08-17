@@ -9,8 +9,12 @@ button {
 
 /*CUSTOM UTILITY CLASSES*/
 .error {
-  color: rgb(205, 42, 42);
-  font-style: italic;
+  display: inline-block;
+  color: var(--secondary);
+  margin: .5rem auto;
+  padding: 1rem;
+  border-radius: 8px;
+  outline: 1px solid var(--secondary);
 }
 .error__detail {
   font-weight: bold;

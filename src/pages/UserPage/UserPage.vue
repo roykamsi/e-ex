@@ -2,7 +2,6 @@
   <section>
     <h1>My personal account</h1>
     <h2>Added products</h2>
-    <p>{{ errorInfo }}</p>
     <form @submit.prevent>
       <p>
         <label for="uploadImage">Upload Image</label>
@@ -28,22 +27,30 @@
       <p v-if="errorInfo" class="error">{{ errorInfo }}</p>
       <p><button type="submit" @click="addProduct">Add product</button></p>
     </form>
-    <ul>
-      <!-- <li v-for="usrProd in userProducts" :key="usrProd.id"></li> -->
-    </ul>
+    <section class="products-grid">
+      <items-gridder>
+        <product-element
+          v-for="product in userProducts"
+          :key="product.id"
+          :pid="product.id"
+          :pname="product.name"
+          :pprice="product.price"
+          :pcategory="product.category || product.category.text"
+        />
+      </items-gridder>
+    </section>
   </section>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { fbStorage, firebaseApp } from "../../firebaseInit";
 
 const store = useStore();
 
 const errorInfo = computed(() => store.getters.getError);
 const userId = localStorage.getItem("userId");
-const userProducts = computed(() => store.getters("getAddedProducts"));
+const userProducts = computed(() => store.getters["getUserProducts"]);
 const prodTagsRaw = ref([]);
 const prodTags = ref([]);
 const tag = ref("");
@@ -60,6 +67,10 @@ function uploadImage(e) {
   });
 }
 
+onMounted(() => {
+  store.dispatch("fetchProducts", { userId });
+});
+
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   await store.dispatch("addProduct", {
@@ -68,7 +79,10 @@ async function addProduct() {
     prodPrice: prodPrice.value,
     prodTags: prodTags.value,
   });
-  await store.dispatch("fetchProducts", { userId, errorInfo: errorInfo.value });
+  await store.dispatch("addAndUpdateUserProducts", {
+    userId,
+    errorInfo: errorInfo.value,
+  });
 }
 
 store.dispatch("getUserData", {
@@ -81,8 +95,13 @@ store.dispatch("getUserData", {
 </script>
 
 <style scoped>
-/* The ***vue-tags-input*** component has scoped styling, 
-so you can edit it with !important in the ../style/vue-tags.css file.
+/* 
+The ***vue-tags-input*** component has scoped styling, 
+so you need to edit it with !important in the ../style/vue-tags.css file.
 Docs: http://www.vue-tags-input.com/#/examples/styling
 */
+.products-grid {
+  width: 50%;
+  margin: 1.5rem auto;
+}
 </style>
