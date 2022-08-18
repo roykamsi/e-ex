@@ -5,6 +5,9 @@ export default {
   getUserProducts(state) {
     return state.auth.userData.addedProducts
   },
+  isUsersProduct(state) {
+    return state.auth.userData.isHisProduct
+  },
   getFilteredProducts(state) {
     return state.filteredProducts;
   },

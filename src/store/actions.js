@@ -153,7 +153,7 @@ export default {
         for (const data of resData) {
           if (data[0] === userId) {
             const eachProduct = Object.entries(data[1].addedProducts);
-            let products = []
+            let products = [];
             eachProduct.forEach((prod) => {
               const product = {
                 id: prod[0],
@@ -161,15 +161,14 @@ export default {
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
               };
-              products.push(product)
+              products.push(product);
             });
             state.auth.userData.addedProducts = products
           }
         }
       })
       .catch((err) => {
-        console.log(err);
-        return (err.message = payload.errorInfo);
+        return (state.auth.errorInfo = err.message);
       });
   },
   addAndUpdateUserProducts({ commit }, payload) {

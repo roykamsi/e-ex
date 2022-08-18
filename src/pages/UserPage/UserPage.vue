@@ -67,9 +67,7 @@ function uploadImage(e) {
   });
 }
 
-onMounted(() => {
-  store.dispatch("fetchProducts", { userId });
-});
+store.dispatch("fetchProducts", { userId });
 
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
@@ -84,14 +82,6 @@ async function addProduct() {
     errorInfo: errorInfo.value,
   });
 }
-
-store.dispatch("getUserData", {
-  userId,
-  firstName: null,
-  lastName: null,
-  addedProducts: [],
-  removedProducts: [],
-});
 </script>
 
 <style scoped>

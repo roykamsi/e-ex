@@ -8,5 +8,6 @@ export default {
     lastName: null,
     addedProducts: [],
     removedProducts: [],
+    isHisProduct: null,
   }
 }
