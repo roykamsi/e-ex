@@ -13,13 +13,14 @@ import VueTagsInput from '@sipec/vue3-tags-input'
 import ProductElement from "./components/productsPage/ProductElement.vue";
 import ItemsGridder from './components/productsPage/ItemsGridder.vue'
 
-const app = createApp(App)
 
+const app = createApp(App)
 
 app.use(jQuery)
 app.use(router)
 app.use(store)
 app.use(VueAxios, axios)
+
 
 app.component("BaseCard", BaseCard)
 app.component("VueTagsInput", VueTagsInput)

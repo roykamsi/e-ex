@@ -5,6 +5,9 @@ export default {
   getUserProducts(state) {
     return state.auth.userData.addedProducts;
   },
+  isUploaded(state) {
+    return state.auth.userData.isUploaded
+  },
   isUsersProduct(state) {
     const usrProds = state.auth.userData.addedProducts;
     const localUserId = localStorage.getItem('userId')
@@ -15,6 +18,9 @@ export default {
   },
   getCategories(state) {
     return state.filters.catMerged;
+  },
+  getSuggestedCategories(state) {
+
   },
   getSelectAll(state) {
     return state.filters.selectAll;

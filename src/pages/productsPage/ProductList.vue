@@ -13,7 +13,7 @@
           :pid="product.id"
           :pname="product.name"
           :pprice="product.price"
-          :pcategory="product.category || product.category.text"
+          :pcategory="product.category"
         />
       </div>
     </section>

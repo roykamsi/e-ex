@@ -1,7 +1,6 @@
 import axios from "axios";
 import config from "../../config.js";
 
-
 export default {
   loadProducts({ commit, state }) {
     const productsEndPoint =
@@ -23,7 +22,7 @@ export default {
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
             const renameInputData = userProds.forEach((prod) => {
-              const eachUserId = userId
+              const eachUserId = userId;
               const [eachProdId] = prod;
               const prodId = eachProdId.slice(1, -1);
               const eachUsrProd = Object.entries(prod[1]);
@@ -43,7 +42,7 @@ export default {
                 priceArr,
                 catArr,
                 idArr,
-                ['userId', eachUserId]
+                ["userId", eachUserId],
               ]);
               /* Above you can add more elements to the array
               hate to do this s***t but I'm still a newbie :/ */
@@ -133,7 +132,7 @@ export default {
       console.log("error occurred");
     }
   },
-  addProduct(_1, payload) {
+  addProduct({ commit }, payload) {
     axios.post(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
       {
@@ -143,6 +142,35 @@ export default {
       }
     );
     // commit("addProduct", payload.addedProduct);
+  },
+  addAndUpdateUserProducts({ commit, state }, payload) {
+    axios
+      .get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
+      )
+      .then((res) => {
+        const userId = payload.userId;
+        const resData = Object.entries(res.data);
+        for (const data of resData) {
+          const product = {
+            id: data[0],
+            name: data[1].prodName,
+            price: data[1].prodPrice,
+            category: data[1].prodTags,
+            // image TO BE ADDED ****
+            userId,
+          };
+          commit("updateProducts", product);
+        }
+        if(res.status === 200) {
+          console.log(res.status);
+          commit("prodUploaded");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return (err.message = payload.errorInfo);
+      });
   },
   fetchProducts({ commit, state }, payload) {
     axios
@@ -163,11 +191,11 @@ export default {
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
                 userId,
-                deletable: false
+                deletable: false,
               };
               products.push(product);
             });
-            state.auth.userData.addedProducts = products
+            state.auth.userData.addedProducts = products;
           }
         }
       })
@@ -175,36 +203,18 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
-  addAndUpdateUserProducts({ commit }, payload) {
-    axios
-      .get(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
-      )
-      .then((res) => {
-        const userId = payload.userId;
-        const resData = Object.entries(res.data);
-        for (const data of resData) {
-          const product = {
-            id: data[0],
-            name: data[1].prodName,
-            price: data[1].prodPrice,
-            category: data[1].prodTags,
-            // image TO BE ADDED ****
-            userId
-          };
-          console.log(product);
-          commit("updateProducts", product);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        return (err.message = payload.errorInfo);
-      });
-  },
-  async removeProduct({commit, state}, {prodId, userId}) {
-    const res = await axios.delete(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json`)
-    const prodIdx = state.auth.userData.addedProducts.findIndex(el => el.id === prodId)
-    state.auth.userData.addedProducts.splice(prodIdx, 1)
+  async removeProduct({ commit, state }, { prodId, userId }) {
+    const res = await axios.delete(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json`
+    );
+    const deletedProd = state.auth.userData.addedProducts.find(
+      (el) => el.id === prodId
+    );
+    const prodIdx = state.auth.userData.addedProducts.findIndex(
+      (el) => el.id === prodId
+    );
+    state.auth.userData.addedProducts.splice(prodIdx, 1);
+    // const addHistory = await axios.post(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/deletedProducts/${prodId}.json`) // Maybe another time
   },
   logout({ commit }) {
     commit("logout");
