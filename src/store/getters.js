@@ -3,10 +3,12 @@ export default {
     return state.products;
   },
   getUserProducts(state) {
-    return state.auth.userData.addedProducts
+    return state.auth.userData.addedProducts;
   },
   isUsersProduct(state) {
-    return state.auth.userData.isHisProduct
+    const usrProds = state.auth.userData.addedProducts;
+    const localUserId = localStorage.getItem('userId')
+    return usrProds.some(el=> el.userId === localUserId)
   },
   getFilteredProducts(state) {
     return state.filteredProducts;
@@ -60,7 +62,7 @@ export default {
     return state.filters;
   },
   getAddedProducts(state) {
-    state.auth.addedProducts;
+    return state.auth.addedProducts;
   },
   getProductsOrFilteredProducts(state) {
     if (

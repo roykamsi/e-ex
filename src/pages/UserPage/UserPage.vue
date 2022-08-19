@@ -36,6 +36,7 @@
           :pname="product.name"
           :pprice="product.price"
           :pcategory="product.category || product.category.text"
+          @removeProduct="removeProduct"
         />
       </items-gridder>
     </section>
@@ -43,10 +44,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const store = useStore();
+const router = useRouter()
 
 const errorInfo = computed(() => store.getters.getError);
 const userId = localStorage.getItem("userId");
@@ -69,19 +72,28 @@ function uploadImage(e) {
 
 store.dispatch("fetchProducts", { userId });
 
+// ADDING PRODUCT
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   await store.dispatch("addProduct", {
-    userId: userId,
     prodName: prodName.value,
     prodPrice: prodPrice.value,
     prodTags: prodTags.value,
+    userId
   });
   await store.dispatch("addAndUpdateUserProducts", {
     userId,
     errorInfo: errorInfo.value,
   });
 }
+
+// REMOVING PRODUCT
+function removeProduct() {
+  console.log(userProducts.value);
+  
+  // store.commit('removeProduct')
+}
+
 </script>
 
 <style scoped>

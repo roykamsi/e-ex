@@ -10,20 +10,32 @@
       </span>
       <p>Price: {{ pprice }} $</p>
     </div>
-    <button v-if="isUsersProduct" @click="removeProduct">Remove</button>
+    <button v-if="checkIfPersonalProduct" @click="removeProduct">Remove</button>
   </base-card>
 </template>
 
 <script setup>
 import { useStore } from "vuex";
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
+import { useRoute } from "vue-router";
 
-defineProps(["pname", "pimage", "pprice", "pcategory", "pid"]);
-defineEmits(['removeProduct'])
+const props = defineProps(["pname", "pimage", "pprice", "pcategory", "pid"]);
+const emit = defineEmits(["removeProduct"]);
 
+const route = useRoute();
 const store = useStore();
 
-const isUsersProduct = store.getters["isUsersProduct"];
+// Check if we are in the store and if it's user's product
+let isUsersProduct = computed(() => store.getters.isUsersProduct);
+const presentRoute = route.path.slice(1);
+let checkIfPersonalProduct = isUsersProduct && presentRoute === "mystore"; 
+
+const userId = localStorage.getItem("userId");
+
+// REMOVE BUTTON
+function removeProduct() {
+  store.dispatch("removeProduct", { prodId: props.pid, userId })
+}
 </script>
 
 <style lang="scss" scoped>

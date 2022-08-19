@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "../../config.js";
 
+
 export default {
   loadProducts({ commit, state }) {
     const productsEndPoint =
@@ -22,6 +23,7 @@ export default {
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
             const renameInputData = userProds.forEach((prod) => {
+              const eachUserId = userId
               const [eachProdId] = prod;
               const prodId = eachProdId.slice(1, -1);
               const eachUsrProd = Object.entries(prod[1]);
@@ -41,10 +43,10 @@ export default {
                 priceArr,
                 catArr,
                 idArr,
+                ['userId', eachUserId]
               ]);
-              // Above you can add more elements to the array
-
-              // Hate to do this s***t but I'm still a newbie :/
+              /* Above you can add more elements to the array
+              hate to do this s***t but I'm still a newbie :/ */
               const prodsIntoEntries = Object.fromEntries(EACH_USER_PROD); // Reconverting them into Objects again
               return renamedUserProds.push(prodsIntoEntries); // this is what matters
             });
@@ -160,6 +162,8 @@ export default {
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
+                userId,
+                deletable: false
               };
               products.push(product);
             });
@@ -186,7 +190,9 @@ export default {
             price: data[1].prodPrice,
             category: data[1].prodTags,
             // image TO BE ADDED ****
+            userId
           };
+          console.log(product);
           commit("updateProducts", product);
         }
       })
@@ -194,7 +200,11 @@ export default {
         console.log(err);
         return (err.message = payload.errorInfo);
       });
-    commit("updateProducts");
+  },
+  async removeProduct({commit, state}, {prodId, userId}) {
+    const res = await axios.delete(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json`)
+    const prodIdx = state.auth.userData.addedProducts.findIndex(el => el.id === prodId)
+    state.auth.userData.addedProducts.splice(prodIdx, 1)
   },
   logout({ commit }) {
     commit("logout");
