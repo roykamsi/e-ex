@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import badWords from "../../store/data/italianBadWordsList.js";
@@ -73,30 +73,18 @@ const errorInfo = computed(() => store.getters.getError);
 
 const userId = localStorage.getItem("userId");
 const userProducts = computed(() => store.getters["getUserProducts"]);
+const getSuggestedCategories = computed(
+  () => store.getters["getSuggestedCategories"]
+);
 const prodTagsRaw = ref([]);
 const prodTags = ref([]);
 const tag = ref("");
-let catSuggested = ref([]);
 const prodName = ref("");
 const prodPrice = ref();
 
-// SUGGESTED CATEGORIES
-const getSuggestedCategories = computed(() => {
-  let tag2 = tag2.value;
-  let catMerged = catMerged.value;
-  let catSuggested = catSuggested.value;
-  let newArr = [];
-  for (const tag of catMerged) {
-    const tags = { text: tag };
-    newArr.push(tags);
-  }
-  console.log(catSuggested);
-  console.log(tag2);
-  catSuggested.filter((i) => {
-    return i.text.toLowerCase().indexOf(tag2.toLowerCase()) !== -1;
-  });
-  return false
-});
+watch(tag, ()=>{
+  store.state.filters.tag = tag
+})
 
 // IMAGE UPLOADING
 function uploadImage(e) {

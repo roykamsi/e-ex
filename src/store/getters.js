@@ -21,6 +21,15 @@ export default {
   },
   getSuggestedCategories(state) {
 
+    // Here I needed to add a text as key before the tag since the component vue-tag-manager requires it
+    let newArr = []
+    for (const tag of state.filters.catMerged) {
+      newArr.push({text: tag})
+    }
+
+    state.filters.catSuggested = newArr.filter((i) => i.text.toLowerCase().indexOf(state.filters.tag.toLowerCase()) !== -1);
+
+    return state.filters.catSuggested
   },
   getSelectAll(state) {
     return state.filters.selectAll;
