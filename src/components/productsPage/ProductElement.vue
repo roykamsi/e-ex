@@ -46,4 +46,9 @@ function removeProduct() {
   border-radius: 2.26px;
   padding: 0.2rem 0.8rem;
 }
+.img-container {
+  width: 50%;
+  text-align: center;
+  margin: 0 auto;
+}
 </style>

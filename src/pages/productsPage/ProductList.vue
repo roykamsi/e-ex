@@ -11,6 +11,7 @@
           v-for="product in products"
           :key="product.id"
           :pid="product.id"
+          :pimage="product.image"
           :pname="product.name"
           :pprice="product.price"
           :pcategory="product.category"
@@ -33,6 +34,8 @@ useRouter();
 store.dispatch("loadProducts");
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
+
+onMounted(()=> setTimeout(()=>console.log(products.value), 2000))
 
 </script>
 

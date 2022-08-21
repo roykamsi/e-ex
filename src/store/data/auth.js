@@ -7,6 +7,7 @@ export default {
     userId: null,
     firstName: null,
     lastName: null,
+    prodMeta: null,
     addedProducts: [],
     removedProducts: [],
     isHisProduct: null,

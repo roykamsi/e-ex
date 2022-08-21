@@ -1,4 +1,5 @@
 import axios from "axios";
+import { nextTick } from "vue";
 import config from "../../config.js";
 
 export default {
@@ -117,6 +118,7 @@ export default {
   getUserData({ commit }, payload) {
     commit("getUserData", payload);
   },
+  // THIS BELOW IS FOR TESTING PURPOSES
   sendRequest({ commit }, payload) {
     try {
       axios
@@ -132,17 +134,24 @@ export default {
       console.log("error occurred");
     }
   },
-  addProduct({ commit }, payload) {
-    axios.post(
+  async addProduct({ commit, state }, payload) {
+    commit("uploadImage", {
+      image: `images/${payload.userId}/${payload.fileName}`,
+    });
+    nextTick()
+    await axios.post(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
       {
         prodName: payload.prodName,
         prodPrice: payload.prodPrice,
         prodTags: payload.prodTags,
+        prodImgData: state.auth.userData.prodMeta,
+        prodImage: `gs://e-ex-ddc18.appspot.com/images/${payload.userId}/${payload.fileName}`
       }
     );
-    // commit("addProduct", payload.addedProduct);
+    console.log(state.auth.userData.prodMeta);
   },
+  // THIS BELOW LOOKS THE SAME, BUT IT ADDS PRODUCTS LOCALLY
   addAndUpdateUserProducts({ commit, state }, payload) {
     axios
       .get(
@@ -151,25 +160,29 @@ export default {
       .then((res) => {
         const userId = payload.userId;
         const resData = Object.entries(res.data);
+        console.log(resData);
         for (const data of resData) {
+        const addedProds = Object.entries(data[1].addedProducts);
+        console.log(addedProds[1]);
           const product = {
-            id: data[0],
-            name: data[1].prodName,
-            price: data[1].prodPrice,
-            category: data[1].prodTags,
-            // image TO BE ADDED ****
+            id: addedProds[0][0],
+            name: addedProds[1][1].prodName,
+            price: addedProds[1][1].prodPrice,
+            category: addedProds[1][1].prodTags,
+            image: addedProds[1][1].prodImage,
             userId,
           };
+          console.log(addedProds[1][1]);
           commit("updateProducts", product);
         }
-        if(res.status === 200) {
+        if (res.status === 200) {
           console.log(res.status);
           commit("prodUploaded");
         }
       })
       .catch((err) => {
         console.log(err);
-        return (err.message = payload.errorInfo);
+        return (state.auth.errorInfo = err.message);
       });
   },
   fetchProducts({ commit, state }, payload) {
@@ -190,6 +203,7 @@ export default {
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
+                image: prod[1].prodImage || 'No image',
                 userId,
                 deletable: false,
               };

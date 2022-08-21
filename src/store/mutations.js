@@ -5,7 +5,7 @@ export default {
     state.products = reqProds.concat(renamedUserProds);
   },
   prodUploaded(state) {
-    state.auth.userData.isUploaded = true
+    state.auth.userData.isUploaded = true;
   },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
@@ -53,22 +53,15 @@ export default {
     state.products.push(payload);
   },
   uploadImage(state, { image }) {
-    const meta = {
-      contentType: "image",
-    };
     const getRef = ref(fbStorage, image);
 
-    if (getRef.name.toLowerCase().includes("jpg" || "jpeg" || "png")) {
-      uploadBytes(getRef, image, meta)
-        .then((snapshot) => {
-          console.log("File uploaded", snapshot);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      state.auth.errorInfo = "Upload error, try selecting an image.";
-    }
+    uploadBytes(getRef, image)
+      .then((snapshot) => {
+        state.auth.userData.prodMeta = snapshot.metadata.md5Hash;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   logout(state) {
     state.auth.isLoggedIn = false;

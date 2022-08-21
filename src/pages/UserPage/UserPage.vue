@@ -5,7 +5,7 @@
     <form @submit.prevent>
       <p>
         <label for="uploadImage">Upload Image</label>
-        <input type="file" id="uploadImage" @change="uploadImage" />
+        <input type="file" accept="image/png, image/jpeg" id="uploadImage" @change="imageData" />
       </p>
       <p>
         <label for="prodName">Product name</label>
@@ -76,30 +76,36 @@ const userProducts = computed(() => store.getters["getUserProducts"]);
 const getSuggestedCategories = computed(
   () => store.getters["getSuggestedCategories"]
 );
-const prodTagsRaw = ref([]);
-const prodTags = ref([]);
-const tag = ref("");
+
 const prodName = ref("");
 const prodPrice = ref();
 
-watch(tag, ()=>{
-  store.state.filters.tag = tag
-})
+// TAG MANAGEMENT
+const prodTagsRaw = ref([]);
+const prodTags = ref([]);
+const tag = ref("");
+watch(tag, () => {
+  store.state.filters.tag = tag;
+});
 
 // IMAGE UPLOADING
-function uploadImage(e) {
+const file = ref();
+function imageData(e) {
   if (!e.target.files.length) return;
-  const file = e.target.files[0];
-  console.log(file);
-  store.commit("uploadImage", {
-    image: `images/${file.name}`,
-  });
+  file.value = e.target.files[0];
 }
+// function uploadImage() {
+//   store.commit("uploadImage", {
+//     image: `images/${userId}/${file.value.name}`,
+//   });
+// } // Devi sincronizzare i dati quando vengono caricati e scaricati con l'MD5 data, controlla Firebase DOCS
+
 store.dispatch("fetchProducts", { userId });
 
 // ADDING PRODUCT
 function checkBeforeAddingProduct() {
   if (
+    file.value &&
     prodName.value !== "" &&
     prodName.value.match(/(?!^\d+$)^.+$/) && // NO only numbers in the name
     prodName.value.length > 21 &&
@@ -109,7 +115,24 @@ function checkBeforeAddingProduct() {
   ) {
     addProduct();
   } else {
-    errorInfoLocal.value = "There was an error with your input data.";
+    if (prodName.value === "") {
+      errorInfoLocal.value = "The product name is empty.";
+    } else if (!file.value) {
+      errorInfoLocal.value = "Image not detected.";
+    } else if (!prodName.value.match(/(?!^\d+$)^.+$/)) {
+      errorInfoLocal.value = "Only numbers is not allowed.";
+    } else if (prodName.value.length < 21) {
+      errorInfoLocal.value = "Be more concise with the product name.";
+    } else if (badWords.some((word) => prodName.value.includes(word))) {
+      errorInfoLocal.value = "No bad words allowed!";
+    } else if (prodPrice.value < 25) {
+      errorInfoLocal.value = "The price is too low.";
+    } else if (prodTagsRaw.value.length < 0) {
+      errorInfoLocal.value = "At least one tag is required.";
+    } else {
+      errorInfoLocal.value = "There was an error with your input data.";
+    }
+    console.log(file.value);
   }
 }
 
@@ -120,6 +143,7 @@ async function addProduct() {
     prodPrice: prodPrice.value,
     prodTags: prodTags.value,
     userId,
+    fileName: file.value.name
   });
   await store.dispatch("addAndUpdateUserProducts", {
     userId,
