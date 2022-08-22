@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
@@ -35,7 +35,11 @@ store.dispatch("loadProducts");
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 
-onMounted(()=> setTimeout(()=>console.log(products.value), 2000))
+// *** TESTING AREA ***
+// onMounted(()=> console.log(products.value))
+// function debug() {
+//   store.dispatch('loadProducts')
+// }
 
 </script>
 

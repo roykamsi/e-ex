@@ -5,7 +5,12 @@
     <form @submit.prevent>
       <p>
         <label for="uploadImage">Upload Image</label>
-        <input type="file" accept="image/png, image/jpeg" id="uploadImage" @change="imageData" />
+        <input
+          type="file"
+          accept="image/jpeg"
+          id="uploadImage"
+          @change="imageData"
+        />
       </p>
       <p>
         <label for="prodName">Product name</label>
@@ -52,6 +57,7 @@
           :pid="product.id"
           :pname="product.name"
           :pprice="product.price"
+          :pimage="product.image"
           :pcategory="product.category || product.category.text"
         />
       </items-gridder>
@@ -132,20 +138,22 @@ function checkBeforeAddingProduct() {
     } else {
       errorInfoLocal.value = "There was an error with your input data.";
     }
-    console.log(file.value);
   }
 }
 
-async function addProduct() {
+function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
-  await store.dispatch("addProduct", {
+  store.commit("uploadImage", {
+    imageData: file.value,
+    imageName: `images/${userId}/${file.value.name}`,
+  });
+  store.dispatch("addProduct", {
     prodName: prodName.value,
     prodPrice: prodPrice.value,
     prodTags: prodTags.value,
     userId,
-    fileName: file.value.name
   });
-  await store.dispatch("addAndUpdateUserProducts", {
+  store.dispatch("addAndUpdateUserProducts", {
     userId,
     errorInfo: errorInfo.value,
   });

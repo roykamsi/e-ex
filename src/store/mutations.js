@@ -1,8 +1,9 @@
-import { fbStorage, uploadBytes, ref } from "../firebaseInit.js";
+import axios from "axios";
+import { fbStorage, uploadBytes, ref, getDownloadURL } from "../firebaseInit.js";
 
 export default {
-  addProductsToLocal(state, { reqProds, renamedUserProds }) {
-    state.products = reqProds.concat(renamedUserProds);
+  addProductsToLocal(state, { reqProds, userProducts }) {
+    state.products = reqProds.concat(userProducts);
   },
   prodUploaded(state) {
     state.auth.userData.isUploaded = true;
@@ -52,13 +53,17 @@ export default {
   updateProducts(state, payload) {
     state.products.push(payload);
   },
-  uploadImage(state, { image }) {
-    const getRef = ref(fbStorage, image);
+  // IMAGE UPLOADING IS COMMITTED IN THE **UserPage.Vue**
+  uploadImage(state, { imageName, imageData }) {
+    const getRef = ref(fbStorage, imageName);
 
-    uploadBytes(getRef, image)
-      .then((snapshot) => {
-        state.auth.userData.prodMeta = snapshot.metadata.md5Hash;
-      })
+    uploadBytes(getRef, imageData)
+      .then(()=> {
+          getDownloadURL(getRef).then(url=>{
+            state.auth.userData.prodImgUrl = url
+          })
+        }
+      )
       .catch((err) => {
         console.log(err);
       });

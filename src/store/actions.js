@@ -16,42 +16,25 @@ export default {
         axios.spread((...res) => {
           const reqProds = Object.entries(res[0].data)[0][1];
           const eachUser = Object.entries(res[1].data);
-          let renamedUserProds = [];
           // Now let's transform EACH entry to match the products objects
           // ++ this gonna be tough to understand ++
+          let userProducts = [];
           eachUser.forEach((user) => {
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
-            const renameInputData = userProds.forEach((prod) => {
-              const eachUserId = userId;
-              const [eachProdId] = prod;
-              const prodId = eachProdId.slice(1, -1);
-              const eachUsrProd = Object.entries(prod[1]);
-              const idArr = ["id", prodId]; // Inserting the prodId
-              let [name, nameVal] = eachUsrProd[0];
-              name = "name";
-              let [price, priceVal] = eachUsrProd[1];
-              price = "price";
-              let [category, catVal] = eachUsrProd[2];
-              category = "category";
-              // Making out an array for each of them
-              const nameArr = Array.from([name, nameVal]);
-              const priceArr = Array.from([price, priceVal]);
-              const catArr = Array.from([category, catVal]);
-              const EACH_USER_PROD = Array.from([
-                nameArr,
-                priceArr,
-                catArr,
-                idArr,
-                ["userId", eachUserId],
-              ]);
-              /* Above you can add more elements to the array
-              hate to do this s***t but I'm still a newbie :/ */
-              const prodsIntoEntries = Object.fromEntries(EACH_USER_PROD); // Reconverting them into Objects again
-              return renamedUserProds.push(prodsIntoEntries); // this is what matters
+            userProds.forEach((prod, idx) => {
+              const product = {
+                id: prod[0],
+                name: prod[1].prodName,
+                price: prod[1].prodPrice,
+                category: prod[1].prodTags,
+                image: prod[1].prodImgData || "No image",
+                userId,
+              };
+              userProducts.push(product);
             });
           });
-          commit("addProductsToLocal", { reqProds, renamedUserProds });
+          commit("addProductsToLocal", { reqProds, userProducts });
           commit("filterCategories");
         })
       )
@@ -119,39 +102,34 @@ export default {
     commit("getUserData", payload);
   },
   // THIS BELOW IS FOR TESTING PURPOSES
-  sendRequest({ commit }, payload) {
+  sendRequest({ commit, state }, payload) {
     try {
       axios
         .post(
           `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json`,
           { userId: payload.userId, giga: "chad" }
         )
-        .then((res) => console.log(res.data))
         .catch((err) => (payload.errorInfo = err));
 
       commit("sendRequest", { userId: payload.userId });
-    } catch {
-      console.log("error occurred");
+    } catch (err) {
+      state.auth.errorInfo = err.message
     }
   },
-  async addProduct({ commit, state }, payload) {
-    commit("uploadImage", {
-      image: `images/${payload.userId}/${payload.fileName}`,
-    });
-    nextTick()
-    await axios.post(
+  addProduct({ _, state }, payload) {
+    console.log(state.auth.userData.prodImgUrl);
+    axios.post(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
       {
         prodName: payload.prodName,
         prodPrice: payload.prodPrice,
         prodTags: payload.prodTags,
-        prodImgData: state.auth.userData.prodMeta,
-        prodImage: `gs://e-ex-ddc18.appspot.com/images/${payload.userId}/${payload.fileName}`
+        prodImgData: state.auth.userData.prodImgUrl,
+        // prodImage: `gs://e-ex-ddc18.appspot.com/images/${payload.userId}/${payload.fileName}`
       }
     );
-    console.log(state.auth.userData.prodMeta);
   },
-  // THIS BELOW LOOKS THE SAME, BUT IT ADDS PRODUCTS LOCALLY
+  // THIS BELOW LOOKS THE SAME, BUT GETS PRODUCTS LOCALLY
   addAndUpdateUserProducts({ commit, state }, payload) {
     axios
       .get(
@@ -160,28 +138,29 @@ export default {
       .then((res) => {
         const userId = payload.userId;
         const resData = Object.entries(res.data);
-        console.log(resData);
         for (const data of resData) {
-        const addedProds = Object.entries(data[1].addedProducts);
-        console.log(addedProds[1]);
-          const product = {
-            id: addedProds[0][0],
-            name: addedProds[1][1].prodName,
-            price: addedProds[1][1].prodPrice,
-            category: addedProds[1][1].prodTags,
-            image: addedProds[1][1].prodImage,
-            userId,
-          };
-          console.log(addedProds[1][1]);
-          commit("updateProducts", product);
+          if (data[0] === userId) {
+            const eachProduct = Object.entries(data[1].addedProducts);
+            let products = [];
+            eachProduct.forEach((prod) => {
+              const product = {
+                id: prod[0],
+                name: prod[1].prodName,
+                price: prod[1].prodPrice,
+                category: prod[1].prodTags,
+                image: prod[1].prodImgData || "No image",
+                userId,
+              };
+              products.push(product);
+            });
+            commit("updateProducts", products);
+          }
         }
         if (res.status === 200) {
-          console.log(res.status);
           commit("prodUploaded");
         }
       })
       .catch((err) => {
-        console.log(err);
         return (state.auth.errorInfo = err.message);
       });
   },
@@ -203,7 +182,7 @@ export default {
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
-                image: prod[1].prodImage || 'No image',
+                image: prod[1].prodImage || "No image",
                 userId,
                 deletable: false,
               };

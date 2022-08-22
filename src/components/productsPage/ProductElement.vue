@@ -1,7 +1,7 @@
 <template>
   <base-card>
     <div class="img-container">
-      <img :src="pimage" :alt="pname" />
+      <img :src="pimage" :alt="pname + ' ' + 'image'" />
     </div>
     <h2>{{ pname }}</h2>
     <div>
@@ -20,15 +20,15 @@ import { defineProps, defineEmits, computed } from "vue";
 import { useRoute } from "vue-router";
 
 const props = defineProps(["pname", "pimage", "pprice", "pcategory", "pid"]);
-const emit = defineEmits(["removeProduct"]);
+defineEmits(["removeProduct"]);
 
 const route = useRoute();
 const store = useStore();
 
 // Check if we are in the store and if it's user's product
 let isUsersProduct = computed(() => store.getters.isUsersProduct);
-const presentRoute = route.path.slice(1);
-let checkIfPersonalProduct = isUsersProduct && presentRoute === "mystore"; 
+const actualRoute = route.path.slice(1);
+let checkIfPersonalProduct = isUsersProduct && actualRoute === "mystore"; 
 
 const userId = localStorage.getItem("userId");
 
