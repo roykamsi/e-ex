@@ -11,6 +11,7 @@
       <p>Price: {{ pprice }} $</p>
     </div>
     <button v-if="checkIfPersonalProduct" @click="removeProduct">Remove</button>
+    <h6 v-if="!checkIfPersonalProduct && puserName">Seller: {{puserName}}</h6>
   </base-card>
 </template>
 
@@ -19,7 +20,7 @@ import { useStore } from "vuex";
 import { defineProps, defineEmits, computed } from "vue";
 import { useRoute } from "vue-router";
 
-const props = defineProps(["pname", "pimage", "pprice", "pcategory", "pid"]);
+const props = defineProps(["pname", "pimage", "pprice", "pcategory", "puserName", "pid"]);
 defineEmits(["removeProduct"]);
 
 const route = useRoute();

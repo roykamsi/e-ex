@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h1>My personal account</h1>
+    <h1>My store</h1>
     <h2>Added products</h2>
     <form @submit.prevent>
       <p>
@@ -37,6 +37,7 @@
           :tags="prodTagsRaw"
           @tags-changed="(newTags) => (prodTagsRaw = newTags)"
           class="tag-input"
+          :validation="validation"
           :autocomplete-items="getSuggestedCategories"
         />
       </p>
@@ -70,6 +71,7 @@ import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import badWords from "../../store/data/italianBadWordsList.js";
+import errorMessages from "../../store/data/errorMessages.js";
 
 const store = useStore();
 const router = useRouter();
@@ -92,13 +94,39 @@ const prodTags = ref([]);
 const tag = ref("");
 watch(tag, () => {
   store.state.filters.tag = tag;
+  isTagBadWord();
 });
+function isTagBadWord() {
+  const checkVal = badWords.some((word) => tag.value.toLowerCase().includes(word));
+  if (checkVal) {
+    tag.value = errorMessages.BAD_WORDS;
+    return setTimeout(() => (tag.value = ""), 1000);
+  }
+}
+const validation = ref([
+  {
+    classes: "no-numbers",
+    rule: /^([^0-9]*)$/,
+    disableAdd: true,
+  },
+  {
+    classes: "no-braces",
+    rule: ({ text }) => text.indexOf("{") !== -1 || text.indexOf("}") !== -1,
+    disableAdd: true,
+  },
+]);
 
 // IMAGE UPLOADING
 const file = ref();
 function imageData(e) {
-  if (!e.target.files.length) return;
-  file.value = e.target.files[0];
+  if (e.target.files[0].size > 1000000) {
+    return errorInfoLocal.value = errorMessages.IMAGE_TOO_HEAVY
+  } else if (!e.target.files.length) {
+    return errorInfoLocal.value = errorMessages.NO_FILE
+  } else {
+    file.value = e.target.files[0];
+    errorInfoLocal.value = null
+  }
 }
 // function uploadImage() {
 //   store.commit("uploadImage", {
@@ -120,6 +148,7 @@ function checkBeforeAddingProduct() {
     prodTagsRaw.value.length > 0
   ) {
     addProduct();
+    store.dispatch("fetchProducts", { userId });
   } else {
     if (prodName.value === "") {
       errorInfoLocal.value = "The product name is empty.";
@@ -129,8 +158,8 @@ function checkBeforeAddingProduct() {
       errorInfoLocal.value = "Only numbers is not allowed.";
     } else if (prodName.value.length < 21) {
       errorInfoLocal.value = "Be more concise with the product name.";
-    } else if (badWords.some((word) => prodName.value.includes(word))) {
-      errorInfoLocal.value = "No bad words allowed!";
+    } else if (badWords.some((word) => prodName.value.toLowerCase().includes(word))) {
+      errorInfoLocal.value = errorMessages.BAD_WORDS;
     } else if (prodPrice.value < 25) {
       errorInfoLocal.value = "The price is too low.";
     } else if (prodTagsRaw.value.length < 0) {
@@ -170,5 +199,9 @@ Docs: http://www.vue-tags-input.com/#/examples/styling
 .products-grid {
   width: 50%;
   margin: 1.5rem auto;
+}
+
+.bad-words {
+  color: red;
 }
 </style>

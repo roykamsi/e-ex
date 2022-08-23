@@ -1,4 +1,8 @@
 export default {
+  isRegistered(state) {
+    console.log(state.auth.userData.userName);
+    return state.auth.userData.userName
+  },
   getProducts(state) {
     return state.products;
   },

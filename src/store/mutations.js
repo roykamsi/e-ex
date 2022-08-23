@@ -1,4 +1,3 @@
-import axios from "axios";
 import { fbStorage, uploadBytes, ref, getDownloadURL } from "../firebaseInit.js";
 
 export default {
@@ -38,13 +37,6 @@ export default {
   async signIn(state, payload) {
     state.auth.isLoggedIn = payload.isLoggedIn;
     state.auth.errorInfo = payload.errorInfo;
-  },
-  getUserData(state, payload) {
-    state.auth.userData.userId = payload.userId;
-    state.auth.userData.firstName = payload.firstName;
-    state.auth.userData.lastName = payload.lastName;
-    state.auth.userData.addedProducts = payload.addedProducts;
-    state.auth.userData.removedProducts = payload.removedProducts;
   },
   sendRequest(state, payload) {
     state.auth.userData.userId = payload.userId;

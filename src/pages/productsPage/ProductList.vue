@@ -11,6 +11,7 @@
           v-for="product in products"
           :key="product.id"
           :pid="product.id"
+          :puserName="product.userName"
           :pimage="product.image"
           :pname="product.name"
           :pprice="product.price"
@@ -31,7 +32,8 @@ const store = useStore();
 useRoute();
 useRouter();
 // const isFiltering = computed(() => store.getters["isFiltering"]);
-store.dispatch("loadProducts");
+const userId = computed(()=> localStorage.getItem('userId'))
+store.dispatch("loadProducts", {userId: userId.value});
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 

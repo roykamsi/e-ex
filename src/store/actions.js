@@ -3,23 +3,41 @@ import { nextTick } from "vue";
 import config from "../../config.js";
 
 export default {
-  loadProducts({ commit, state }) {
+  setUserData({ _, state }, { firstName, lastName, userName, userId }) {
+    axios.post(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`,
+      {
+        firstName,
+        lastName,
+        userName,
+      }
+    );
+    localStorage.setItem("userName", userName);
+    state.auth.userData.firstName = firstName;
+    state.auth.userData.lastName = lastName;
+    state.auth.userData.userName = userName;
+  },
+  loadProducts({ commit, state }, { userId }) {
     const productsEndPoint =
       "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json";
     const userProdsEndPoint =
       "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json";
+    const userNameReqEndPoint =
+      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json";
     const productsReq = axios.get(productsEndPoint);
     const userProdsReq = axios.get(userProdsEndPoint);
+    const userNameReq = axios.get(userNameReqEndPoint);
     axios
-      .all([productsReq, userProdsReq])
+      .all([productsReq, userProdsReq, userNameReq])
       .then(
         axios.spread((...res) => {
           const reqProds = Object.entries(res[0].data)[0][1];
           const eachUser = Object.entries(res[1].data);
-          // Now let's transform EACH entry to match the products objects
-          // ++ this gonna be tough to understand ++
+          const eachUserName = Object.entries(res[2].data);
           let userProducts = [];
-          eachUser.forEach((user) => {
+          eachUser.forEach((user, idx) => {
+            const userDetails = eachUserName[idx][1]
+            const userName = userDetails.userDetails !== undefined ? Object.values(userDetails.userDetails)[0].userName : null
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
             userProds.forEach((prod, idx) => {
@@ -29,13 +47,14 @@ export default {
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
                 image: prod[1].prodImgData || "No image",
+                userName,
                 userId,
               };
               userProducts.push(product);
             });
+            commit("addProductsToLocal", { reqProds, userProducts });
+            commit("filterCategories");
           });
-          commit("addProductsToLocal", { reqProds, userProducts });
-          commit("filterCategories");
         })
       )
       .catch((errors) => {
@@ -113,11 +132,10 @@ export default {
 
       commit("sendRequest", { userId: payload.userId });
     } catch (err) {
-      state.auth.errorInfo = err.message
+      state.auth.errorInfo = err.message;
     }
   },
   addProduct({ _, state }, payload) {
-    console.log(state.auth.userData.prodImgUrl);
     axios.post(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
       {
@@ -125,7 +143,6 @@ export default {
         prodPrice: payload.prodPrice,
         prodTags: payload.prodTags,
         prodImgData: state.auth.userData.prodImgUrl,
-        // prodImage: `gs://e-ex-ddc18.appspot.com/images/${payload.userId}/${payload.fileName}`
       }
     );
   },
@@ -182,7 +199,7 @@ export default {
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
                 category: prod[1].prodTags,
-                image: prod[1].prodImage || "No image",
+                image: prod[1].prodImgData || "No image",
                 userId,
                 deletable: false,
               };
