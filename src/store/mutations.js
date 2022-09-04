@@ -4,8 +4,11 @@ export default {
   addProductsToLocal(state, { reqProds, userProducts }) {
     state.products = reqProds.concat(userProducts);
   },
+  newProdUpload(state) {
+    state.auth.userData.isUploaded = false
+  },
   prodUploaded(state) {
-    state.auth.userData.isUploaded = true;
+    state.auth.userData.isUploaded = !state.auth.userData.isUploaded
   },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES

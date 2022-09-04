@@ -33,7 +33,8 @@ useRoute();
 useRouter();
 // const isFiltering = computed(() => store.getters["isFiltering"]);
 const userId = computed(()=> localStorage.getItem('userId'))
-store.dispatch("loadProducts", {userId: userId.value});
+
+store.dispatch("loadProducts", {userId: userId.value})
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 

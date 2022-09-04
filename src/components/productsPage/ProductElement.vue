@@ -32,10 +32,11 @@ const actualRoute = route.path.slice(1);
 let checkIfPersonalProduct = isUsersProduct && actualRoute === "mystore"; 
 
 const userId = localStorage.getItem("userId");
+const idToken = localStorage.getItem("idToken");
 
 // REMOVE BUTTON
 function removeProduct() {
-  store.dispatch("removeProduct", { prodId: props.pid, userId })
+  store.dispatch("removeProduct", { prodId: props.pid, userId, authToken: idToken })
 }
 </script>
 

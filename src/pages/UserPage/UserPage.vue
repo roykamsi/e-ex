@@ -2,7 +2,8 @@
   <section>
     <h1>My store</h1>
     <h2>Added products</h2>
-    <form @submit.prevent>
+    <p v-if="!isUploaded"><button @click="newUpload">Add another product</button></p>
+    <form @submit.prevent v-if="isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
         <input
@@ -41,15 +42,15 @@
           :autocomplete-items="getSuggestedCategories"
         />
       </p>
-      <p v-if="errorInfo || errorInfoLocal" class="error">
-        {{ errorInfo || errorInfoLocal }}
-      </p>
       <p>
         <button type="submit" @click="checkBeforeAddingProduct">
           Add product
         </button>
       </p>
     </form>
+    <p v-if=" errorInfoLocal" class="error">
+        {{  errorInfoLocal }}
+      </p>
     <section class="products-grid">
       <items-gridder>
         <product-element
@@ -67,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import badWords from "../../store/data/italianBadWordsList.js";
@@ -81,6 +82,7 @@ const errorInfo = computed(() => store.getters.getError);
 
 const userId = localStorage.getItem("userId");
 const userProducts = computed(() => store.getters["getUserProducts"]);
+const isUploaded = computed(()=> store.getters.isUploaded)
 const getSuggestedCategories = computed(
   () => store.getters["getSuggestedCategories"]
 );
@@ -97,7 +99,9 @@ watch(tag, () => {
   isTagBadWord();
 });
 function isTagBadWord() {
-  const checkVal = badWords.some((word) => tag.value.toLowerCase().includes(word));
+  const checkVal = badWords.some((word) =>
+    tag.value.toLowerCase().includes(word)
+  );
   if (checkVal) {
     tag.value = errorMessages.BAD_WORDS;
     return setTimeout(() => (tag.value = ""), 1000);
@@ -120,12 +124,12 @@ const validation = ref([
 const file = ref();
 function imageData(e) {
   if (e.target.files[0].size > 1000000) {
-    return errorInfoLocal.value = errorMessages.IMAGE_TOO_HEAVY
+    return (errorInfoLocal.value = errorMessages.IMAGE_TOO_HEAVY);
   } else if (!e.target.files.length) {
-    return errorInfoLocal.value = errorMessages.NO_FILE
+    return (errorInfoLocal.value = errorMessages.NO_FILE);
   } else {
     file.value = e.target.files[0];
-    errorInfoLocal.value = null
+    errorInfoLocal.value = null;
   }
 }
 // function uploadImage() {
@@ -148,7 +152,6 @@ function checkBeforeAddingProduct() {
     prodTagsRaw.value.length > 0
   ) {
     addProduct();
-    store.dispatch("fetchProducts", { userId });
   } else {
     if (prodName.value === "") {
       errorInfoLocal.value = "The product name is empty.";
@@ -158,7 +161,9 @@ function checkBeforeAddingProduct() {
       errorInfoLocal.value = "Only numbers is not allowed.";
     } else if (prodName.value.length < 21) {
       errorInfoLocal.value = "Be more concise with the product name.";
-    } else if (badWords.some((word) => prodName.value.toLowerCase().includes(word))) {
+    } else if (
+      badWords.some((word) => prodName.value.toLowerCase().includes(word))
+    ) {
       errorInfoLocal.value = errorMessages.BAD_WORDS;
     } else if (prodPrice.value < 25) {
       errorInfoLocal.value = "The price is too low.";
@@ -172,21 +177,28 @@ function checkBeforeAddingProduct() {
 
 function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
-  store.commit("uploadImage", {
-    imageData: file.value,
-    imageName: `images/${userId}/${file.value.name}`,
-  });
-  store.dispatch("addProduct", {
-    prodName: prodName.value,
-    prodPrice: prodPrice.value,
-    prodTags: prodTags.value,
-    userId,
-  });
-  store.dispatch("addAndUpdateUserProducts", {
-    userId,
-    errorInfo: errorInfo.value,
-  });
-  router.push("/products");
+  if (!errorInfoLocal.value) {
+    store.commit("uploadImage", {
+      imageData: file.value,
+      imageName: `images/${userId}/${file.value.name}`,
+    });
+    store.dispatch("addProduct", {
+      prodName: prodName.value,
+      prodPrice: prodPrice.value,
+      prodTags: prodTags.value,
+      userId,
+    });
+    store.dispatch("addAndUpdateUserProducts", {
+      userId,
+      errorInfo: errorInfo.value,
+    })
+    setTimeout(() => {
+      store.dispatch("fetchProducts", { userId }) // Fetch the products async
+    }, 1000);
+  } else return
+}
+function newUpload() {
+  return store.commit('prodUploaded') // Toggling added product
 }
 </script>
 

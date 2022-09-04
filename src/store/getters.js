@@ -7,6 +7,7 @@ export default {
     return state.products;
   },
   getUserProducts(state) {
+    console.log('getUserProducts');
     return state.auth.userData.addedProducts;
   },
   isUploaded(state) {

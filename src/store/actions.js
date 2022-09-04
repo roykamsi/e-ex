@@ -3,9 +3,12 @@ import { nextTick } from "vue";
 import config from "../../config.js";
 
 export default {
-  setUserData({ _, state }, { firstName, lastName, userName, userId }) {
+  setUserData(
+    { _, state },
+    { firstName, lastName, userName, userId, authToken }
+  ) {
     axios.post(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`,
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${authToken}`,
       {
         firstName,
         lastName,
@@ -18,12 +21,9 @@ export default {
     state.auth.userData.userName = userName;
   },
   loadProducts({ commit, state }, { userId }) {
-    const productsEndPoint =
-      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json";
-    const userProdsEndPoint =
-      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json";
-    const userNameReqEndPoint =
-      "https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json";
+    const productsEndPoint = `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/products.json`;
+    const userProdsEndPoint = `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`;
+    const userNameReqEndPoint = `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`;
     const productsReq = axios.get(productsEndPoint);
     const userProdsReq = axios.get(userProdsEndPoint);
     const userNameReq = axios.get(userNameReqEndPoint);
@@ -36,8 +36,11 @@ export default {
           const eachUserName = Object.entries(res[2].data);
           let userProducts = [];
           eachUser.forEach((user, idx) => {
-            const userDetails = eachUserName[idx][1]
-            const userName = userDetails.userDetails !== undefined ? Object.values(userDetails.userDetails)[0].userName : null
+            const userDetails = eachUserName[idx][1];
+            const userName =
+              userDetails.userDetails !== undefined
+                ? Object.values(userDetails.userDetails)[0].userName
+                : null;
             const [userId, addedProducts] = user;
             const userProds = Object.entries(addedProducts.addedProducts);
             userProds.forEach((prod, idx) => {
@@ -125,7 +128,7 @@ export default {
     try {
       axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json`,
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json?auth=${payload.userId}`,
           { userId: payload.userId, giga: "chad" }
         )
         .catch((err) => (payload.errorInfo = err));
@@ -135,16 +138,18 @@ export default {
       state.auth.errorInfo = err.message;
     }
   },
-  addProduct({ _, state }, payload) {
-    axios.post(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
-      {
-        prodName: payload.prodName,
-        prodPrice: payload.prodPrice,
-        prodTags: payload.prodTags,
-        prodImgData: state.auth.userData.prodImgUrl,
-      }
-    );
+  addProduct({ commit, state }, payload) {
+    axios
+      .post(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
+        {
+          prodName: payload.prodName,
+          prodPrice: payload.prodPrice,
+          prodTags: payload.prodTags,
+          prodImgData: state.auth.userData.prodImgUrl,
+        }
+      )
+      .catch((err) => ((state.auth.errorInfo = err), console.log(err)));
   },
   // THIS BELOW LOOKS THE SAME, BUT GETS PRODUCTS LOCALLY
   addAndUpdateUserProducts({ commit, state }, payload) {
@@ -213,7 +218,7 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
-  async removeProduct({ commit, state }, { prodId, userId }) {
+  async removeProduct({ commit, state }, { prodId, userId, authToken }) {
     const res = await axios.delete(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json`
     );
@@ -224,7 +229,7 @@ export default {
       (el) => el.id === prodId
     );
     state.auth.userData.addedProducts.splice(prodIdx, 1);
-    // const addHistory = await axios.post(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/deletedProducts/${prodId}.json`) // Maybe another time
+    // const addHistory = await axios.post(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/deletedProducts/${prodId}.json?auth=${authToken}`) // Maybe another time
   },
   logout({ commit }) {
     commit("logout");
