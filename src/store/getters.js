@@ -1,13 +1,14 @@
 export default {
   isRegistered(state) {
-    console.log(state.auth.userData.userName);
-    return state.auth.userData.userName
+    return state.auth.userData.userName || localStorage.getItem('firstName')
+  },
+  getFirstName(state) {
+    return state.auth.userData.firstName || localStorage.getItem('firstName')
   },
   getProducts(state) {
     return state.products;
   },
   getUserProducts(state) {
-    console.log('getUserProducts');
     return state.auth.userData.addedProducts;
   },
   isUploaded(state) {
@@ -82,7 +83,8 @@ export default {
     return state.filters;
   },
   getAddedProducts(state) {
-    return state.auth.addedProducts;
+    console.log(state.auth.userData.addedProducts);
+    return state.auth.userData.addedProducts;
   },
   getProductsOrFilteredProducts(state) {
     if (
@@ -99,9 +101,10 @@ export default {
     return state.auth.isLoggedIn || localStorage.getItem("idToken");
   },
   userToken(state) {
-    return state.auth.userId;
+    return state.auth.userData.userId
   },
   getError(state) {
+    console.log(state.auth.errorInfo);
     return state.auth.errorInfo;
   },
 };

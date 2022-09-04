@@ -35,6 +35,7 @@ useRouter();
 const userId = computed(()=> localStorage.getItem('userId'))
 
 store.dispatch("loadProducts", {userId: userId.value})
+store.dispatch("fetchFirstNameIfRegistered")
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 

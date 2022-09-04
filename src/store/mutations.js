@@ -8,7 +8,7 @@ export default {
     state.auth.userData.isUploaded = false
   },
   prodUploaded(state) {
-    state.auth.userData.isUploaded = !state.auth.userData.isUploaded
+    state.auth.userData.isUploaded = true
   },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
@@ -34,10 +34,6 @@ export default {
     state.products = state.filteredProducts;
   },
   async signup(state, payload) {
-    state.auth.isLoggedIn = payload.isLoggedIn;
-    state.auth.errorInfo = payload.errorInfo;
-  },
-  async signIn(state, payload) {
     state.auth.isLoggedIn = payload.isLoggedIn;
     state.auth.errorInfo = payload.errorInfo;
   },

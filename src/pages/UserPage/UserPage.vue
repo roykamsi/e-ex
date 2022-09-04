@@ -2,8 +2,8 @@
   <section>
     <h1>My store</h1>
     <h2>Added products</h2>
-    <p v-if="!isUploaded"><button @click="newUpload">Add another product</button></p>
-    <form @submit.prevent v-if="isUploaded">
+    <p v-if="isUploaded"><button @click="newUpload"> {{getAddedProducts.length != 0 ? 'Add another product' : 'Add your first product'}} </button></p>
+    <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
         <input
@@ -43,7 +43,7 @@
         />
       </p>
       <p>
-        <button type="submit" @click="checkBeforeAddingProduct">
+        <button type="submit">
           Add product
         </button>
       </p>
@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import badWords from "../../store/data/italianBadWordsList.js";
@@ -86,6 +86,7 @@ const isUploaded = computed(()=> store.getters.isUploaded)
 const getSuggestedCategories = computed(
   () => store.getters["getSuggestedCategories"]
 );
+const getAddedProducts = computed(()=> store.getters.getAddedProducts)
 
 const prodName = ref("");
 const prodPrice = ref();
@@ -152,6 +153,7 @@ function checkBeforeAddingProduct() {
     prodTagsRaw.value.length > 0
   ) {
     addProduct();
+    store.commit('prodUploaded')
   } else {
     if (prodName.value === "") {
       errorInfoLocal.value = "The product name is empty.";
@@ -175,20 +177,20 @@ function checkBeforeAddingProduct() {
   }
 }
 
-function addProduct() {
+async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   if (!errorInfoLocal.value) {
     store.commit("uploadImage", {
       imageData: file.value,
       imageName: `images/${userId}/${file.value.name}`,
     });
-    store.dispatch("addProduct", {
+    await store.dispatch("addProduct", {
       prodName: prodName.value,
       prodPrice: prodPrice.value,
       prodTags: prodTags.value,
       userId,
     });
-    store.dispatch("addAndUpdateUserProducts", {
+    await store.dispatch("addAndUpdateUserProducts", {
       userId,
       errorInfo: errorInfo.value,
     })
@@ -198,7 +200,7 @@ function addProduct() {
   } else return
 }
 function newUpload() {
-  return store.commit('prodUploaded') // Toggling added product
+  return store.commit('newProdUpload')
 }
 </script>
 
