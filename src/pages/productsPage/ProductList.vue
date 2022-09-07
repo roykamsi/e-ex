@@ -39,6 +39,7 @@ store.dispatch("fetchFirstNameIfRegistered")
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 
+
 // *** TESTING AREA ***
 // onMounted(()=> console.log(products.value))
 // function debug() {

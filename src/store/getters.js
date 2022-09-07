@@ -100,6 +100,9 @@ export default {
   isLoggedIn(state) {
     return state.auth.isLoggedIn || localStorage.getItem("idToken");
   },
+  getAuthToken(state) {
+    return state.auth.userData.userToken // Expires in 1h
+  },
   userToken(state) {
     return state.auth.userData.userId
   },

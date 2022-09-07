@@ -8,7 +8,7 @@ export default {
     { firstName, lastName, userName, userId, authToken }
   ) {
     axios.put(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`,
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
       {
         firstName,
         lastName,
@@ -27,15 +27,17 @@ export default {
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`
       )
       .then((res) => {
-        const firstName = res.data.firstName || undefined || null;
-        state.auth.userData.firstName = firstName;
-        localStorage.setItem("firstName", firstName);
+        if (res.data != null) {
+          const firstName = res.data.firstName;
+          localStorage.setItem("firstName", firstName);
+          state.auth.userData.firstName = firstName;
+        } else return;
       });
   },
   changeUserName({ _, state }, { userId, userNameInput }) {
     axios
       .patch(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`,
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
         {
           userName: userNameInput,
         }
@@ -83,6 +85,7 @@ export default {
         })
       )
       .catch((errors) => {
+        console.log(errors);
         state.auth.errorInfo = errors.message;
       });
   },
@@ -97,7 +100,7 @@ export default {
   async signup({ commit, state }, payload) {
     await axios
       .post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${config.API_KEY}`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw`,
         {
           email: payload.email,
           password: payload.password,
@@ -107,8 +110,9 @@ export default {
       .then((res) => {
         this.clearLog;
         payload.isLoggedIn = true;
-        state.auth.userData.userId = res.data.localId
+        state.auth.userData.userId = res.data.localId;
         localStorage.setItem("userId", res.data.localId);
+        state.auth.userData.authToken = res.data.idToken;
         localStorage.setItem("idToken", res.data.idToken);
       })
       .catch((err) => {
@@ -118,11 +122,12 @@ export default {
           : err.response;
       });
     commit("signup", payload);
+    commit("autoLogout");
   },
   async signIn({ commit, state }, payload) {
     await axios
       .post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${config.API_KEY}`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw`,
         {
           email: payload.email,
           password: payload.password,
@@ -133,11 +138,13 @@ export default {
         this.clearLog;
         state.auth.isLoggedIn = true;
         localStorage.setItem("userId", res.data.localId);
+        state.auth.userData.authToken = res.data.idToken;
         localStorage.setItem("idToken", res.data.idToken);
+        commit("autoLogout");
       })
       .catch((err) => {
         payload.isLoggedIn = false;
-        state.auth.errorInfo = err.response.data.error.message
+        state.auth.errorInfo = err.response.data.error.message;
         localStorage.clear();
         commit("signIn", payload.email);
       });
@@ -145,12 +152,12 @@ export default {
   getUserData({ commit }, payload) {
     commit("getUserData", payload);
   },
-  // THIS BELOW IS FOR TESTING PURPOSES
+  // THIS BELOW IS FOR TESTING PURPOSES 🧪
   sendRequest({ commit, state }, payload) {
     try {
       axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json?auth=${payload.userId}`,
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json?auth=${payload.userId}?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
           { userId: payload.userId, giga: "chad" }
         )
         .catch((err) => (payload.errorInfo = err));
@@ -163,7 +170,7 @@ export default {
   addProduct({ commit, state }, payload) {
     axios
       .post(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json`,
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
         {
           prodName: payload.prodName,
           prodPrice: payload.prodPrice,
@@ -208,7 +215,7 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
-  fetchProducts({ commit, state }, payload) {
+  fetchUserProducts({ commit, state }, payload) {
     axios
       .get(
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
@@ -240,9 +247,10 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
-  async removeProduct({ commit, state }, { prodId, userId, authToken }) {
+  async removeProduct({ commit, state }, { prodId, userId }) {
+    const authToken = state.auth.userData.authToken || localStorage.getItem('idToken');
     const res = await axios.delete(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json`
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
     );
     const deletedProd = state.auth.userData.addedProducts.find(
       (el) => el.id === prodId

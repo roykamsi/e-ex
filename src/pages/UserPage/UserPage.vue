@@ -139,7 +139,7 @@ function imageData(e) {
 //   });
 // } // Devi sincronizzare i dati quando vengono caricati e scaricati con l'MD5 data, controlla Firebase DOCS
 
-store.dispatch("fetchProducts", { userId });
+store.dispatch("fetchUserProducts", { userId });
 
 // ADDING PRODUCT
 function checkBeforeAddingProduct() {
@@ -195,7 +195,7 @@ async function addProduct() {
       errorInfo: errorInfo.value,
     })
     setTimeout(() => {
-      store.dispatch("fetchProducts", { userId }) // Fetch the products async
+      store.dispatch("fetchUserProducts", { userId }) // Fetch the products async
     }, 1000);
   } else return
 }
