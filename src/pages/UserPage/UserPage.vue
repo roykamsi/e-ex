@@ -2,7 +2,15 @@
   <section>
     <h1>My store</h1>
     <h2>Added products</h2>
-    <p v-if="isUploaded"><button @click="newUpload"> {{getAddedProducts.length != 0 ? 'Add another product' : 'Add your first product'}} </button></p>
+    <p v-if="isUploaded">
+      <button @click="newUpload">
+        {{
+          getAddedProducts.length != 0
+            ? "Add another product"
+            : "Add your first product"
+        }}
+      </button>
+    </p>
     <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
@@ -43,14 +51,12 @@
         />
       </p>
       <p>
-        <button type="submit">
-          Add product
-        </button>
+        <button type="submit">Add product</button>
       </p>
     </form>
-    <p v-if=" errorInfoLocal" class="error">
-        {{  errorInfoLocal }}
-      </p>
+    <p v-if="errorInfoLocal" class="error">
+      {{ errorInfoLocal }}
+    </p>
     <section class="products-grid">
       <items-gridder>
         <product-element
@@ -82,11 +88,11 @@ const errorInfo = computed(() => store.getters.getError);
 
 const userId = localStorage.getItem("userId");
 const userProducts = computed(() => store.getters["getUserProducts"]);
-const isUploaded = computed(()=> store.getters.isUploaded)
+const isUploaded = computed(() => store.getters.isUploaded);
 const getSuggestedCategories = computed(
   () => store.getters["getSuggestedCategories"]
 );
-const getAddedProducts = computed(()=> store.getters.getAddedProducts)
+const getAddedProducts = computed(() => store.getters.getAddedProducts);
 
 const prodName = ref("");
 const prodPrice = ref();
@@ -100,7 +106,7 @@ watch(tag, () => {
   isTagBadWord();
 });
 function isTagBadWord() {
-  const checkVal = badWords.some((word) =>
+    const checkVal = badWords.some((word) =>
     tag.value.toLowerCase().includes(word)
   );
   if (checkVal) {
@@ -153,7 +159,13 @@ function checkBeforeAddingProduct() {
     prodTagsRaw.value.length > 0
   ) {
     addProduct();
-    store.commit('prodUploaded')
+    // START EMPTYING VALUES
+    file.value = null
+    prodTagsRaw.value.length = 0
+    tag.value = ''
+    prodPrice.value = ''
+    prodName.value = ''
+    // END EMPTYING VALUES
   } else {
     if (prodName.value === "") {
       errorInfoLocal.value = "The product name is empty.";
@@ -180,7 +192,7 @@ function checkBeforeAddingProduct() {
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   if (!errorInfoLocal.value) {
-    store.commit("uploadImage", {
+    await store.dispatch("uploadImage", {
       imageData: file.value,
       imageName: `images/${userId}/${file.value.name}`,
     });
@@ -190,17 +202,19 @@ async function addProduct() {
       prodTags: prodTags.value,
       userId,
     });
-    await store.dispatch("addAndUpdateUserProducts", {
-      userId,
-      errorInfo: errorInfo.value,
-    })
-    setTimeout(() => {
-      store.dispatch("fetchUserProducts", { userId }) // Fetch the products async
-    }, 1000);
-  } else return
+    if (isUploaded.value) {
+      await store.dispatch("addAndUpdateUserProducts", {
+        userId,
+        errorInfo: errorInfo.value,
+      });
+      setTimeout(() => {
+        store.dispatch("fetchUserProducts", { userId }); // Fetch the products async
+      }, 1000);
+    }
+  } else return;
 }
 function newUpload() {
-  return store.commit('newProdUpload')
+  return store.commit("newProdUpload");
 }
 </script>
 

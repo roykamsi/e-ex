@@ -83,7 +83,6 @@ export default {
     return state.filters;
   },
   getAddedProducts(state) {
-    console.log(state.auth.userData.addedProducts);
     return state.auth.userData.addedProducts;
   },
   getProductsOrFilteredProducts(state) {
@@ -107,7 +106,6 @@ export default {
     return state.auth.userData.userId
   },
   getError(state) {
-    console.log(state.auth.errorInfo);
     return state.auth.errorInfo;
   },
 };

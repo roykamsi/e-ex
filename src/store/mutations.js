@@ -1,10 +1,3 @@
-import {
-  fbStorage,
-  uploadBytes,
-  ref,
-  getDownloadURL,
-} from "../firebaseInit.js";
-
 export default {
   addProductsToLocal(state, { reqProds, userProducts }) {
     state.products = reqProds.concat(userProducts);
@@ -49,20 +42,6 @@ export default {
   updateProducts(state, payload) {
     state.products.push(payload);
   },
-  // IMAGE UPLOADING IS COMMITTED IN THE **UserPage.Vue**
-  uploadImage(state, { imageName, imageData }) {
-    const getRef = ref(fbStorage, imageName);
-
-    uploadBytes(getRef, imageData)
-      .then(() => {
-        getDownloadURL(getRef).then((url) => {
-          state.auth.userData.prodImgUrl = url;
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  },
   logout(state) {
     state.auth.isLoggedIn = false;
     state.auth.userData.authToken = null;
@@ -70,7 +49,7 @@ export default {
   },
   autoLogout(state) {
     // Retains the timeout even after page refresh
-    const waitTime = 1000 * 60 * 60;
+    const waitTime = 1000 * 3600;
     let executionTime;
     const initialTime = localStorage.getItem("initialTime");
 
@@ -82,7 +61,7 @@ export default {
         parseInt(initialTime, 10) + waitTime - new Date().getTime();
       if (executionTime < 0) executionTime = 0;
     }
-
+    
     setTimeout(() => {
       state.auth.isLoggedIn = false;
       state.auth.userData.authToken = null;

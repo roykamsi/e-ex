@@ -1,6 +1,7 @@
 import axios from "axios";
 import { nextTick } from "vue";
 import config from "../../config.js";
+import { fbStorage, uploadBytes, ref, getDownloadURL } from "@/firebaseInit.js";
 
 export default {
   setUserData(
@@ -8,7 +9,9 @@ export default {
     { firstName, lastName, userName, userId, authToken }
   ) {
     axios.put(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
+        state.auth.userData.authToken || localStorage.getItem("idToken")
+      }`,
       {
         firstName,
         lastName,
@@ -37,7 +40,9 @@ export default {
   changeUserName({ _, state }, { userId, userNameInput }) {
     axios
       .patch(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
+          state.auth.userData.authToken || localStorage.getItem("idToken")
+        }`,
         {
           userName: userNameInput,
         }
@@ -157,7 +162,11 @@ export default {
     try {
       axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}.json?auth=${payload.userId}?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
+            payload.userId
+          }.json?auth=${payload.userId}?auth=${
+            state.auth.userData.authToken || localStorage.getItem("idToken")
+          }`,
           { userId: payload.userId, giga: "chad" }
         )
         .catch((err) => (payload.errorInfo = err));
@@ -167,18 +176,38 @@ export default {
       state.auth.errorInfo = err.message;
     }
   },
-  addProduct({ commit, state }, payload) {
-    axios
-      .post(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json?auth=${state.auth.userData.authToken || localStorage.getItem('idToken')}`,
-        {
-          prodName: payload.prodName,
-          prodPrice: payload.prodPrice,
-          prodTags: payload.prodTags,
-          prodImgData: state.auth.userData.prodImgUrl,
-        }
-      )
-      .catch((err) => ((state.auth.errorInfo = err), console.log(err)));
+  async uploadImage({ _, state }, { imageName, imageData }) {
+    // IMAGE UPLOADING IS COMMITTED IN THE **UserPage.Vue**
+    const getRef = ref(fbStorage, imageName);
+
+    await uploadBytes(getRef, imageData);
+    getDownloadURL(getRef)
+      .then((url) => {
+        state.auth.userData.prodImgUrl = url;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+  async addProduct({ commit, state }, payload) {
+    if (state.auth.userData.prodImgUrl) {
+      await axios
+        .post(
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
+            payload.userId
+          }/addedProducts.json?auth=${
+            state.auth.userData.authToken || localStorage.getItem("idToken")
+          }`,
+          {
+            prodName: payload.prodName,
+            prodPrice: payload.prodPrice,
+            prodTags: payload.prodTags,
+            prodImgData: state.auth.userData.prodImgUrl,
+          }
+        )
+        .catch((err) => ((state.auth.errorInfo = err), console.log(err)));
+      commit("prodUploaded");
+    }
   },
   // THIS BELOW LOOKS THE SAME, BUT GETS PRODUCTS LOCALLY
   addAndUpdateUserProducts({ commit, state }, payload) {
@@ -206,9 +235,6 @@ export default {
             });
             commit("updateProducts", products);
           }
-        }
-        if (res.status === 200) {
-          commit("prodUploaded");
         }
       })
       .catch((err) => {
@@ -248,7 +274,8 @@ export default {
       });
   },
   async removeProduct({ commit, state }, { prodId, userId }) {
-    const authToken = state.auth.userData.authToken || localStorage.getItem('idToken');
+    const authToken =
+      state.auth.userData.authToken || localStorage.getItem("idToken");
     const res = await axios.delete(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
     );

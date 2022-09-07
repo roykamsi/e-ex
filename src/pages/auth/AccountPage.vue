@@ -7,6 +7,7 @@
           : "My account"
       }}
     </h1>
+    <button @click="autoLogout">Debug logout</button>
     <div v-if="isRegistered">
       <h6>Want to change your user name?</h6>
       <input type="text" name="userName" id="userName" v-model="userNameInput">
@@ -69,6 +70,10 @@ const userId = localStorage.getItem("userId");
 
 if (!storedUserName.value) {
   store.dispatch("fetchFirstNameIfRegistered");
+}
+
+function autoLogout() {
+  store.commit('autoLogout')
 }
 
 function setUserData() {
