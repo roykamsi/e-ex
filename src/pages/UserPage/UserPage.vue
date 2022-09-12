@@ -5,69 +5,71 @@
     <p v-if="isUploaded">
       <button @click="newUpload">
         {{
-          getAddedProducts.length != 0
-            ? "Add another product"
-            : "Add your first product"
+        getAddedProducts.length != 0
+        ? "Add another product"
+        : "Add your first product"
         }}
       </button>
     </p>
     <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
-        <input
-          type="file"
-          accept="image/jpeg"
-          id="uploadImage"
-          @change="imageData"
-        />
+        <input type="file" accept="image/jpeg" id="uploadImage" @change="imageData" />
       </p>
       <p>
         <label for="prodName">Product name</label>
-        <input
-          type="text"
-          id="prodName"
-          v-model="prodName"
-          placeholder="20+ characters allowed"
-        />
+        <input type="text" id="prodName" v-model="prodName" placeholder="20+ characters allowed" />
       </p>
       <p>
         <label for="prodPrice">Product price</label>
-        <input
-          type="number"
-          id="prodPrice"
-          v-model="prodPrice"
-          placeholder="25$ or more"
-        />
+        <input type="number" id="prodPrice" v-model="prodPrice" placeholder="25$ or more" />
       </p>
       <p>
         <label>Product tags</label>
-        <vue-tags-input
-          v-model="tag"
-          :tags="prodTagsRaw"
-          @tags-changed="(newTags) => (prodTagsRaw = newTags)"
-          class="tag-input"
-          :validation="validation"
-          :autocomplete-items="getSuggestedCategories"
-        />
+        <vue-tags-input v-model="tag" :tags="prodTagsRaw" @tags-changed="(newTags) => (prodTagsRaw = newTags)"
+          class="tag-input" :validation="validation" :autocomplete-items="getSuggestedCategories" />
       </p>
       <p>
         <button type="submit">Add product</button>
       </p>
     </form>
+    <div>
+      <form @submit.prevent="editProduct">
+        <div>
+          <select name="product" id="productSelect" @change="selectedProduct">
+            <option disabled selected>-- Edit a product --</option>
+            <option v-for="product in userProducts" :key="product.id" :value="product.id" :pname="product.name">
+              {{ product.name }}
+            </option>
+          </select>
+        </div>
+        <div class="input-data" v-if="getSelectedProduct && editActive">
+          <p>
+            <input type="text" id="prodName" v-model="newProdName" placeholder="Product name" />
+          </p>
+          <p>
+            <input type="number" id="prodPrice" v-model="newProdPrice" placeholder="Product price" />
+          </p>
+          <p>
+            <label>Product tags</label>
+            <vue-tags-input v-model="newTag" :tags="newArrayToRaw"
+              @tags-changed="(newTags) => (newArrayToRaw = newTags)" class="tag-input" :validation="validation"
+              :autocomplete-items="getSuggestedCategories" />
+          </p>
+          <div class="editing-buttons">
+            <button type="submit">Confirm</button>
+            <button type="button" @click="cancelProdEditing">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
     <p v-if="errorInfoLocal" class="error">
       {{ errorInfoLocal }}
     </p>
     <section class="products-grid">
       <items-gridder>
-        <product-element
-          v-for="product in userProducts"
-          :key="product.id"
-          :pid="product.id"
-          :pname="product.name"
-          :pprice="product.price"
-          :pimage="product.image"
-          :pcategory="product.category || product.category.text"
-        />
+        <product-element v-for="product in userProducts" :key="product.id" :pid="product.id" :pname="product.name"
+          :pprice="product.price" :pimage="product.image" :pcategory="product.category || product.category.text" />
       </items-gridder>
     </section>
   </section>
@@ -83,6 +85,10 @@ import errorMessages from "../../store/data/errorMessages.js";
 const store = useStore();
 const router = useRouter();
 
+const editActive = ref(true);
+const reactiveSelectedProdId = ref();
+const getSelectedProduct = computed(() => store.getters.getSelectedProduct);
+
 const errorInfoLocal = ref("");
 const errorInfo = computed(() => store.getters.getError);
 
@@ -97,6 +103,12 @@ const getAddedProducts = computed(() => store.getters.getAddedProducts);
 const prodName = ref("");
 const prodPrice = ref();
 
+const newProdName = ref("");
+const newProdPrice = ref(null);
+const newTag = ref();
+const newArrayToRaw = ref([]); // SECOND TAG ARRAY
+const newProdTags = ref([]);
+
 // TAG MANAGEMENT
 const prodTagsRaw = ref([]);
 const prodTags = ref([]);
@@ -106,7 +118,7 @@ watch(tag, () => {
   isTagBadWord();
 });
 function isTagBadWord() {
-    const checkVal = badWords.some((word) =>
+  const checkVal = badWords.some((word) =>
     tag.value.toLowerCase().includes(word)
   );
   if (checkVal) {
@@ -159,13 +171,6 @@ function checkBeforeAddingProduct() {
     prodTagsRaw.value.length > 0
   ) {
     addProduct();
-    // START EMPTYING VALUES
-    file.value = null
-    prodTagsRaw.value.length = 0
-    tag.value = ''
-    prodPrice.value = ''
-    prodName.value = ''
-    // END EMPTYING VALUES
   } else {
     if (prodName.value === "") {
       errorInfoLocal.value = "The product name is empty.";
@@ -188,7 +193,6 @@ function checkBeforeAddingProduct() {
     }
   }
 }
-
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
   if (!errorInfoLocal.value) {
@@ -202,19 +206,95 @@ async function addProduct() {
       prodTags: prodTags.value,
       userId,
     });
+    console.log(isUploaded.value)
     if (isUploaded.value) {
+      console.log('test')
       await store.dispatch("addAndUpdateUserProducts", {
         userId,
         errorInfo: errorInfo.value,
       });
       setTimeout(() => {
         store.dispatch("fetchUserProducts", { userId }); // Fetch the products async
-      }, 1000);
+      }, 500);
     }
+    // START EMPTYING VALUES
+    file.value = null;
+    prodTagsRaw.value.length = 0;
+    tag.value = "";
+    prodPrice.value = "";
+    prodName.value = "";
+    // END EMPTYING VALUES
   } else return;
 }
 function newUpload() {
   return store.commit("newProdUpload");
+}
+
+// EDIT THE PRODUCT
+
+async function selectedProduct() {
+  const selectedProdId = document.querySelector("select").value;
+  activateProdEdit()
+
+  await store.dispatch("selectedProduct", {
+    selectedProdId,
+    userId,
+  });
+  reactiveSelectedProdId.value = getSelectedProduct.value;
+  if (getSelectedProduct.value) {
+    updateProdInfo();
+  }
+}
+
+function updateProdInfo() {
+  newProdName.value = "Loading...";
+  newProdPrice.value = "Loading...";
+  newProdName.value = reactiveSelectedProdId.value.prodName;
+  newProdPrice.value = reactiveSelectedProdId.value.prodPrice;
+
+  // EDITING THE CATEGORIES
+  let convertNewArrayToRaw = [];
+  let reConvertNewTagListFromRaw = [];
+  console.log(reactiveSelectedProdId.value)
+  reactiveSelectedProdId.value.prodTags.forEach((el) => {
+    const element = {
+      text: el,
+    };
+    convertNewArrayToRaw.push(element); // NOW EACH ELEMENT HAS .text BEFORE
+  });
+  console.log(newArrayToRaw.value)
+  newArrayToRaw.value.forEach((el) => {
+    reConvertNewTagListFromRaw.push(el.text);
+  });
+  newArrayToRaw.value = convertNewArrayToRaw; // ASSIGNING THE TAG VALUES TO THE NEW ONE
+  newProdTags.value = reConvertNewTagListFromRaw
+}
+
+async function editProduct() {
+  const selectedProdId = document.querySelector("select").value;
+  updateProdInfo()
+  // AJAX
+  if (selectedProdId) {
+    store.commit("prodUploaded");
+    await store.dispatch("patchEditedProduct", {
+      userId,
+      selectedProdId: selectedProdId,
+      editedProdName: newProdName.value,
+      editedProdPrice: newProdPrice.value,
+      editedProdTags: newProdTags.value,
+    });
+  }
+  store.dispatch("fetchUserProducts", { userId });
+}
+function cancelProdEditing() {
+  document.querySelector("select").selectedIndex = 0
+  deactivateProdEdit()
+}
+function activateProdEdit() {
+  return editActive.value = true
+}
+function deactivateProdEdit() {
+  return editActive.value = false
 }
 </script>
 
@@ -231,5 +311,11 @@ Docs: http://www.vue-tags-input.com/#/examples/styling
 
 .bad-words {
   color: red;
+}
+
+.editing-buttons {
+  display: flex;
+  justify-content: center;
+  gap: .8rem;
 }
 </style>

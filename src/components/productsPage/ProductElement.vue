@@ -8,16 +8,18 @@
       <span class="categories" v-for="cat in pcategory" :key="cat">
         {{ cat }}
       </span>
-      <p>Price: {{ pprice }} $</p>
+      <p>Price: <span class="editPrice">{{ pprice }}</span>$</p>
     </div>
-    <button v-if="checkIfPersonalProduct" @click="removeProduct">Remove</button>
+    <div class="edit-buttons">
+      <button v-if="checkIfPersonalProduct" @click="removeProduct">Remove</button>
+    </div>
     <h6 v-if="!checkIfPersonalProduct && puserName">Seller: {{puserName}}</h6>
   </base-card>
 </template>
 
 <script setup>
 import { useStore } from "vuex";
-import { defineProps, defineEmits, computed } from "vue";
+import { defineProps, defineEmits, computed, ref } from "vue";
 import { useRoute } from "vue-router";
 
 const props = defineProps(["pname", "pimage", "pprice", "pcategory", "puserName", "pid"]);
@@ -38,6 +40,8 @@ const idToken = localStorage.getItem("idToken");
 function removeProduct() {
   store.dispatch("removeProduct", { prodId: props.pid, userId, authToken: idToken })
 }
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -52,5 +56,13 @@ function removeProduct() {
   width: 50%;
   text-align: center;
   margin: 0 auto;
+}
+
+
+button {
+  width: 100%;
+  display: flex;
+  display: block;
+  margin: 1rem auto;
 }
 </style>

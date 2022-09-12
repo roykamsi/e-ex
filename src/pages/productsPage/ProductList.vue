@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted} from "vue";
+import { computed} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
@@ -36,6 +36,8 @@ const userId = computed(()=> localStorage.getItem('userId'))
 
 store.dispatch("loadProducts", {userId: userId.value})
 store.dispatch("fetchFirstNameIfRegistered")
+
+store.commit("autoLogout")
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
 

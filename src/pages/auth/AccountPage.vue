@@ -2,49 +2,36 @@
   <section>
     <h1>
       {{
-        isRegistered
-          ? `Welcome to your account ${storedUserName}`
-          : "My account"
+      isRegistered
+      ? `Welcome to your account ${storedUserName}`
+      : "My account"
       }}
     </h1>
-    <button @click="autoLogout">Debug logout</button>
     <div v-if="isRegistered">
-      <h6>Want to change your user name?</h6>
-      <input type="text" name="userName" id="userName" v-model="userNameInput">
-      <button @click="changeUserName">Change it</button>
+      <button @click="activateChangeUserName = true, changeMode.userName = true" v-if="!activateChangeUserName">Change
+        your user name</button>
+      <button @click="activateChangeUserName = true, changeMode.firstName = true" v-if="!activateChangeUserName">Change
+        your name</button>
+      <div v-else>
+        <input type="text" name="userName" id="userName" v-model="userNameInput">
+        <button @click="dispatchChange">Change it</button>
+      </div>
     </div>
     <div v-if="!isRegistered">
       <h2>Hi! You haven't set up your data yet!</h2>
       <form @submit.prevent="setUserData">
-        <input
-          type="text"
-          placeholder="Your name (not required)"
-          v-model="name"
-        />
-        <input
-          type="text"
-          placeholder="Your last name (not required)"
-          v-model="lastName"
-        />
+        <input type="text" placeholder="Your name (not required)" v-model="name" />
+        <input type="text" placeholder="Your last name (not required)" v-model="lastName" />
         <div>
           <h2><label for="userName">Choose a great user name</label></h2>
-          <input
-            type="text"
-            name="userName"
-            id="userNames"
-            v-model="userName"
-            required
-            aria-required="true"
-          />
+          <input type="text" name="userName" id="userNames" v-model="userName" required aria-required="true" />
         </div>
         <button type="submit">Yeah, that's correct</button>
         <details>
           <summary>What's needed for</summary>
           <p>
-            <em
-              >Only your username will be used to be displayed along the product
-              you've displayed.</em
-            >
+            <em>Only your username will be used to be displayed along the product
+              you've displayed.</em>
           </p>
         </details>
       </form>
@@ -56,11 +43,17 @@
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 
+const activateChangeUserName = ref(false)
+
 const name = ref("");
 const lastName = ref("");
 const userName = ref("");
 const storedUserName = computed(() => store.getters.getFirstName);
 const userNameInput = ref("")
+const changeMode = ref({
+  userName: false,
+  firstName: false
+})
 
 const store = useStore();
 
@@ -72,9 +65,7 @@ if (!storedUserName.value) {
   store.dispatch("fetchFirstNameIfRegistered");
 }
 
-function autoLogout() {
-  store.commit('autoLogout')
-}
+store.commit('autoLogout')
 
 function setUserData() {
   store.dispatch("setUserData", {
@@ -85,9 +76,36 @@ function setUserData() {
   });
 }
 
-function changeUserName() {
-  store.dispatch('changeUserName', {userId, userNameInput: userNameInput.value}) 
+function dispatchChange() {
+  if (changeMode.value.userName === true) {
+    changeUserName()
+    changeMode.value.userName === false
+  } else if (changeMode.value.firstName === true) {
+    changeFirstName()
+    changeMode.value.firstName === false
+  }
 }
+
+async function changeUserName() {
+  await store.dispatch('changeUserName', { userId, userNameInput: userNameInput.value })
+  activateChangeUserName.value = false
+}
+
+async function changeFirstName() {
+  await store.dispatch('changeFirstName', { userId, userNameInput: userNameInput.value })
+  activateChangeUserName.value = false
+  store.dispatch("fetchFirstNameIfRegistered");
+}
+
 </script>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+button {
+  display: block;
+  margin: auto auto;
+}
+
+button:not(:last-child) {
+  margin-bottom: 1rem;
+}
+</style>

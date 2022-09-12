@@ -11,6 +11,7 @@ export default {
     lastName: null,
     userName: null,
     prodImgUrl: null,
+    selectedProduct: null,
     addedProducts: [],
     removedProducts: [],
     isHisProduct: null,

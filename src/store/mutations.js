@@ -17,6 +17,8 @@ export default {
     state.filters.catFlat = state.filters.catArray.flat(1);
     // UNITING IT
     state.filters.catMerged = [...new Set(state.filters.catFlat)];
+    // MAKING THEM GLOBAL
+    localStorage.setItem('prodCategories', [state.filters.catMerged])
   },
   allTrue(state, payload) {
     state.filters.selectAll = !state.filters.selectAll; // Toggling filtering feature
@@ -41,6 +43,9 @@ export default {
   },
   updateProducts(state, payload) {
     state.products.push(payload);
+  },
+  prodUpdated(state) {
+    state.auth.userData.selectedProduct = null
   },
   logout(state) {
     state.auth.isLoggedIn = false;

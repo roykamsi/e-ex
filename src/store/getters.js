@@ -28,8 +28,9 @@ export default {
   getSuggestedCategories(state) {
 
     // Here I needed to add a text as key before the tag since the component vue-tag-manager requires it
+    const localStorageCats = localStorage.getItem('prodCategories').split(',')
     let newArr = []
-    for (const tag of state.filters.catMerged) {
+    for (const tag of localStorageCats || state.filters.catMerged ) {
       newArr.push({text: tag})
     }
 
@@ -95,6 +96,9 @@ export default {
     } else {
       return state.products;
     }
+  },
+  getSelectedProduct(state) {
+    return state.auth.userData.selectedProduct
   },
   isLoggedIn(state) {
     return state.auth.isLoggedIn || localStorage.getItem("idToken");

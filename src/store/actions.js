@@ -9,8 +9,7 @@ export default {
     { firstName, lastName, userName, userId, authToken }
   ) {
     axios.put(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
-        state.auth.userData.authToken || localStorage.getItem("idToken")
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
       }`,
       {
         firstName,
@@ -40,13 +39,23 @@ export default {
   changeUserName({ _, state }, { userId, userNameInput }) {
     axios
       .patch(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
-          state.auth.userData.authToken || localStorage.getItem("idToken")
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
         }`,
         {
           userName: userNameInput,
         }
       )
+      .catch((err) => (state.auth.errorInfo = err));
+  },
+  changeFirstName({ _, state }, { userId, userNameInput }) {
+    axios
+      .patch(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+        }`,
+        {
+          firstName: userNameInput,
+        }
+      ).then(state.auth.userData.firstName = userNameInput, localStorage.setItem("firstName", userNameInput))
       .catch((err) => (state.auth.errorInfo = err));
   },
   loadProducts({ commit, state }, { userId }) {
@@ -162,10 +171,8 @@ export default {
     try {
       axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
-            payload.userId
-          }.json?auth=${payload.userId}?auth=${
-            state.auth.userData.authToken || localStorage.getItem("idToken")
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId
+          }.json?auth=${payload.userId}?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
           }`,
           { userId: payload.userId, giga: "chad" }
         )
@@ -176,12 +183,42 @@ export default {
       state.auth.errorInfo = err.message;
     }
   },
+  async selectedProduct({ _, state }, { selectedProdId, userId }) {
+    state.auth.userData.selectedProduct = selectedProdId;
+    const authToken =
+      state.auth.userData.authToken || localStorage.getItem("idToken");
+    const res = await axios.get(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${selectedProdId}.json?auth=${authToken}`
+    );
+    state.auth.userData.selectedProduct = res.data;
+  },
+  async patchEditedProduct(
+    { _, state },
+    { userId, selectedProdId, editedProdName, editedProdPrice, editedProdTags }
+  ) {
+    if (state.auth.userData.selectedProduct) {
+      const authToken =
+        state.auth.userData.authToken || localStorage.getItem("idToken");
+      await axios.patch(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${selectedProdId}.json?auth=${authToken}`,
+        {
+          prodName: editedProdName,
+          prodPrice: editedProdPrice,
+          prodTags: editedProdTags,
+        }
+      );
+      const res = await axios.get(
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${selectedProdId}.json?auth=${authToken}`
+      );
+      console.log(res.data);
+    }
+  },
   async uploadImage({ _, state }, { imageName, imageData }) {
     // IMAGE UPLOADING IS COMMITTED IN THE **UserPage.Vue**
     const getRef = ref(fbStorage, imageName);
 
     await uploadBytes(getRef, imageData);
-    getDownloadURL(getRef)
+    await getDownloadURL(getRef)
       .then((url) => {
         state.auth.userData.prodImgUrl = url;
       })
@@ -193,10 +230,7 @@ export default {
     if (state.auth.userData.prodImgUrl) {
       await axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
-            payload.userId
-          }/addedProducts.json?auth=${
-            state.auth.userData.authToken || localStorage.getItem("idToken")
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
           }`,
           {
             prodName: payload.prodName,
@@ -206,7 +240,7 @@ export default {
           }
         )
         .catch((err) => ((state.auth.errorInfo = err), console.log(err)));
-      commit("prodUploaded");
+        commit('prodUploaded')
     }
   },
   // THIS BELOW LOOKS THE SAME, BUT GETS PRODUCTS LOCALLY
@@ -258,7 +292,7 @@ export default {
                 id: prod[0],
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
-                category: prod[1].prodTags,
+                category: prod[1].prodTags || ['computer'],
                 image: prod[1].prodImgData || "No image",
                 userId,
                 deletable: false,
@@ -266,6 +300,7 @@ export default {
               products.push(product);
             });
             state.auth.userData.addedProducts = products;
+            console.log(state.filters.catMerged)
           }
         }
       })
