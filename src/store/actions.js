@@ -114,7 +114,7 @@ export default {
   async signup({ commit, state }, payload) {
     await axios
       .post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${config.API_KEY}git`,
         {
           email: payload.email,
           password: payload.password,
@@ -141,7 +141,7 @@ export default {
   async signIn({ commit, state }, payload) {
     await axios
       .post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDDT4X8ksRdIkRZ6f5SlQoP_RrOYgE9Pkw`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${config.API_KEY}`,
         {
           email: payload.email,
           password: payload.password,
