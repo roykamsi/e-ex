@@ -206,9 +206,9 @@ async function addProduct() {
       prodTags: prodTags.value,
       userId,
     });
-    console.log(isUploaded.value)
+    
     if (isUploaded.value) {
-      console.log('test')
+      
       await store.dispatch("addAndUpdateUserProducts", {
         userId,
         errorInfo: errorInfo.value,
@@ -255,14 +255,14 @@ function updateProdInfo() {
   // EDITING THE CATEGORIES
   let convertNewArrayToRaw = [];
   let reConvertNewTagListFromRaw = [];
-  console.log(reactiveSelectedProdId.value)
+  
   reactiveSelectedProdId.value.prodTags.forEach((el) => {
     const element = {
       text: el,
     };
     convertNewArrayToRaw.push(element); // NOW EACH ELEMENT HAS .text BEFORE
   });
-  console.log(newArrayToRaw.value)
+  
   newArrayToRaw.value.forEach((el) => {
     reConvertNewTagListFromRaw.push(el.text);
   });

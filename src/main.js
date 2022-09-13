@@ -21,6 +21,8 @@ app.use(router)
 app.use(store)
 app.use(VueAxios, axios)
 
+export const useStore = store
+
 
 app.component("BaseCard", BaseCard)
 app.component("VueTagsInput", VueTagsInput)

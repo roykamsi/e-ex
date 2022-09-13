@@ -300,7 +300,6 @@ export default {
               products.push(product);
             });
             state.auth.userData.addedProducts = products;
-            console.log(state.filters.catMerged)
           }
         }
       })
