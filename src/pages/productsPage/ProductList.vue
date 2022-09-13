@@ -11,9 +11,11 @@
           v-for="product in products"
           :key="product.id"
           :pid="product.id"
+          :puserName="product.userName"
+          :pimage="product.image"
           :pname="product.name"
           :pprice="product.price"
-          :pcategory="product.category || product.category.text"
+          :pcategory="product.category"
         />
       </div>
     </section>
@@ -21,19 +23,30 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import ProductElement from "../../components/productsPage/ProductElement.vue";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 
 const store = useStore();
 useRoute();
 useRouter();
 // const isFiltering = computed(() => store.getters["isFiltering"]);
-store.dispatch("loadProducts");
+const userId = computed(()=> localStorage.getItem('userId'))
+
+store.dispatch("loadProducts", {userId: userId.value})
+store.dispatch("fetchFirstNameIfRegistered")
+
+store.commit("autoLogout")
 
 let products = computed(() => store.getters['getProductsOrFilteredProducts']);
+
+
+// *** TESTING AREA ***
+// onMounted(()=> console.log(products.value))
+// function debug() {
+//   store.dispatch('loadProducts')
+// }
 
 </script>
 
@@ -55,7 +68,6 @@ section > div {
 div {
   margin: 0 auto;
   width: 100%;
-  max-width: 70vw;
 }
 aside {
   display: flex;

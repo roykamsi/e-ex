@@ -14,6 +14,7 @@
           required
           placeholder="password"
           v-model.trim="userPassword"
+          autocomplete="on"
         />
         <button type="submit" to="/account">Login</button>
         <button type="button" @click="signup">Signup instead</button>
@@ -38,10 +39,11 @@ const router = useRouter();
 const userEmail = ref("");
 const userPassword = ref("");
 
-const outputError = computed(() => store.getters["getError"]);
+const outputError = computed(() => store.getters.getError);
 const isLoggedIn = computed(() => store.getters["isLoggedIn"]);
 
-let userToken = localStorage.getItem("userId");
+
+let userToken = computed(()=>localStorage.getItem("userId") || store.getters.userToken);
 
 const loginPayload = {
   userId: userToken,
@@ -55,10 +57,10 @@ async function signup() {
   await store.dispatch("signup", {
     email: userEmail.value,
     password: userPassword.value,
-    userId: userToken
+    userId: userToken.value,
   });
   if (!outputError.value && isLoggedIn.value) {
-    return await router.replace(`/account/${userToken}`);
+    return await router.replace(`/account/${userToken.value}`);
   }
 }
 
@@ -67,9 +69,10 @@ async function signIn() {
     await store.dispatch("signIn", {
       email: userEmail.value,
       password: userPassword.value,
-      userToken: userToken,
+      userToken: userToken.value,
+      errorInfo: outputError.value,
     });
-    router.replace(`/products`);
+    if (!outputError.value && isLoggedIn.value) router.replace(`/products`)
   } catch {
     throw console.log("Something went wrong");
   }

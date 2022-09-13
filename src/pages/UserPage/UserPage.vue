@@ -1,89 +1,321 @@
 <template>
   <section>
-    <h1>My personal account</h1>
+    <h1>My store</h1>
     <h2>Added products</h2>
-    <p>{{ errorInfo }}</p>
-    <form @submit.prevent>
+    <p v-if="isUploaded">
+      <button @click="newUpload">
+        {{
+        getAddedProducts.length != 0
+        ? "Add another product"
+        : "Add your first product"
+        }}
+      </button>
+    </p>
+    <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
-        <input type="file" id="uploadImage" @change="uploadImage" />
+        <input type="file" accept="image/jpeg" id="uploadImage" @change="imageData" />
       </p>
       <p>
         <label for="prodName">Product name</label>
-        <input type="text" id="prodName" v-model="prodName" />
+        <input type="text" id="prodName" v-model="prodName" placeholder="20+ characters allowed" />
       </p>
       <p>
         <label for="prodPrice">Product price</label>
-        <input type="number" id="prodPrice" v-model="prodPrice" />
+        <input type="number" id="prodPrice" v-model="prodPrice" placeholder="25$ or more" />
       </p>
       <p>
-        <label>Product name</label>
-        <vue-tags-input
-          v-model="tag"
-          :tags="prodTagsRaw"
-          @tags-changed="(newTags) => (prodTagsRaw = newTags)"
-          class="tag-input"
-        />
+        <label>Product tags</label>
+        <vue-tags-input v-model="tag" :tags="prodTagsRaw" @tags-changed="(newTags) => (prodTagsRaw = newTags)"
+          class="tag-input" :validation="validation" :autocomplete-items="getSuggestedCategories" />
       </p>
-      <button type="submit" @click="addProduct">Add product</button>
+      <p>
+        <button type="submit">Add product</button>
+      </p>
     </form>
-    <ul>
-      <!-- <li v-for="usrProd in userProducts" :key="usrProd.id"></li> -->
-    </ul>
+    <div>
+      <form @submit.prevent="editProduct">
+        <div>
+          <select name="product" id="productSelect" @change="selectedProduct">
+            <option disabled selected>-- Edit a product --</option>
+            <option v-for="product in userProducts" :key="product.id" :value="product.id" :pname="product.name">
+              {{ product.name }}
+            </option>
+          </select>
+        </div>
+        <div class="input-data" v-if="getSelectedProduct && editActive">
+          <p>
+            <input type="text" id="prodName" v-model="newProdName" placeholder="Product name" />
+          </p>
+          <p>
+            <input type="number" id="prodPrice" v-model="newProdPrice" placeholder="Product price" />
+          </p>
+          <p>
+            <label>Product tags</label>
+            <vue-tags-input v-model="newTag" :tags="newArrayToRaw"
+              @tags-changed="(newTags) => (newArrayToRaw = newTags)" class="tag-input" :validation="validation"
+              :autocomplete-items="getSuggestedCategories" />
+          </p>
+          <div class="editing-buttons">
+            <button type="submit">Confirm</button>
+            <button type="button" @click="cancelProdEditing">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <p v-if="errorInfoLocal" class="error">
+      {{ errorInfoLocal }}
+    </p>
+    <section class="products-grid">
+      <items-gridder>
+        <product-element v-for="product in userProducts" :key="product.id" :pid="product.id" :pname="product.name"
+          :pprice="product.price" :pimage="product.image" :pcategory="product.category || product.category.text" />
+      </items-gridder>
+    </section>
   </section>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
-import { fbStorage, firebaseApp } from "../../firebaseInit";
+import { useRouter } from "vue-router";
+import badWords from "../../store/data/italianBadWordsList.js";
+import errorMessages from "../../store/data/errorMessages.js";
 
 const store = useStore();
+const router = useRouter();
 
+const editActive = ref(true);
+const reactiveSelectedProdId = ref();
+const getSelectedProduct = computed(() => store.getters.getSelectedProduct);
+
+const errorInfoLocal = ref("");
 const errorInfo = computed(() => store.getters.getError);
+
 const userId = localStorage.getItem("userId");
-const userProducts = computed(() => store.getters("getAddedProducts"));
+const userProducts = computed(() => store.getters["getUserProducts"]);
+const isUploaded = computed(() => store.getters.isUploaded);
+const getSuggestedCategories = computed(
+  () => store.getters["getSuggestedCategories"]
+);
+const getAddedProducts = computed(() => store.getters.getAddedProducts);
+
+const prodName = ref("");
+const prodPrice = ref();
+
+const newProdName = ref("");
+const newProdPrice = ref(null);
+const newTag = ref();
+const newArrayToRaw = ref([]); // SECOND TAG ARRAY
+const newProdTags = ref([]);
+
+// TAG MANAGEMENT
 const prodTagsRaw = ref([]);
 const prodTags = ref([]);
 const tag = ref("");
-const prodName = ref("");
-const prodPrice = ref(0);
+watch(tag, () => {
+  store.state.filters.tag = tag;
+  isTagBadWord();
+});
+function isTagBadWord() {
+  const checkVal = badWords.some((word) =>
+    tag.value.toLowerCase().includes(word)
+  );
+  if (checkVal) {
+    tag.value = errorMessages.BAD_WORDS;
+    return setTimeout(() => (tag.value = ""), 1000);
+  }
+}
+const validation = ref([
+  {
+    classes: "no-numbers",
+    rule: /^([^0-9]*)$/,
+    disableAdd: true,
+  },
+  {
+    classes: "no-braces",
+    rule: ({ text }) => text.indexOf("{") !== -1 || text.indexOf("}") !== -1,
+    disableAdd: true,
+  },
+]);
 
 // IMAGE UPLOADING
-function uploadImage(e) {
-  if (!e.target.files.length) return;
-  const file = e.target.files[0];
-  console.log(fbStorage);
-  const storageRef = fbStorage;
-  const fileRef = storageRef.child(file.name);
-  fileRef.put(file).then(() => {
-    console.log("File uploaded", file.name);
-  });
+const file = ref();
+function imageData(e) {
+  if (e.target.files[0].size > 1000000) {
+    return (errorInfoLocal.value = errorMessages.IMAGE_TOO_HEAVY);
+  } else if (!e.target.files.length) {
+    return (errorInfoLocal.value = errorMessages.NO_FILE);
+  } else {
+    file.value = e.target.files[0];
+    errorInfoLocal.value = null;
+  }
 }
+// function uploadImage() {
+//   store.commit("uploadImage", {
+//     image: `images/${userId}/${file.value.name}`,
+//   });
+// } // Devi sincronizzare i dati quando vengono caricati e scaricati con l'MD5 data, controlla Firebase DOCS
 
+store.dispatch("fetchUserProducts", { userId });
+
+// ADDING PRODUCT
+function checkBeforeAddingProduct() {
+  if (
+    file.value &&
+    prodName.value !== "" &&
+    prodName.value.match(/(?!^\d+$)^.+$/) && // NO only numbers in the name
+    prodName.value.length > 21 &&
+    !badWords.some((word) => prodName.value.includes(word)) &&
+    prodPrice.value > 25 &&
+    prodTagsRaw.value.length > 0
+  ) {
+    addProduct();
+  } else {
+    if (prodName.value === "") {
+      errorInfoLocal.value = "The product name is empty.";
+    } else if (!file.value) {
+      errorInfoLocal.value = "Image not detected.";
+    } else if (!prodName.value.match(/(?!^\d+$)^.+$/)) {
+      errorInfoLocal.value = "Only numbers is not allowed.";
+    } else if (prodName.value.length < 21) {
+      errorInfoLocal.value = "Be more concise with the product name.";
+    } else if (
+      badWords.some((word) => prodName.value.toLowerCase().includes(word))
+    ) {
+      errorInfoLocal.value = errorMessages.BAD_WORDS;
+    } else if (prodPrice.value < 25) {
+      errorInfoLocal.value = "The price is too low.";
+    } else if (prodTagsRaw.value.length < 0) {
+      errorInfoLocal.value = "At least one tag is required.";
+    } else {
+      errorInfoLocal.value = "There was an error with your input data.";
+    }
+  }
+}
 async function addProduct() {
   prodTagsRaw.value.forEach((el) => prodTags.value.push(el.text));
-  await store.dispatch("addProduct", {
-    userId: userId,
-    prodName: prodName.value,
-    prodPrice: prodPrice.value,
-    prodTags: prodTags.value,
-  });
-  await store.dispatch("fetchProducts", { userId, errorInfo: errorInfo.value });
+  if (!errorInfoLocal.value) {
+    await store.dispatch("uploadImage", {
+      imageData: file.value,
+      imageName: `images/${userId}/${file.value.name}`,
+    });
+    await store.dispatch("addProduct", {
+      prodName: prodName.value,
+      prodPrice: prodPrice.value,
+      prodTags: prodTags.value,
+      userId,
+    });
+    
+    if (isUploaded.value) {
+      
+      await store.dispatch("addAndUpdateUserProducts", {
+        userId,
+        errorInfo: errorInfo.value,
+      });
+      setTimeout(() => {
+        store.dispatch("fetchUserProducts", { userId }); // Fetch the products async
+      }, 500);
+    }
+    // START EMPTYING VALUES
+    file.value = null;
+    prodTagsRaw.value.length = 0;
+    tag.value = "";
+    prodPrice.value = "";
+    prodName.value = "";
+    // END EMPTYING VALUES
+  } else return;
+}
+function newUpload() {
+  return store.commit("newProdUpload");
 }
 
-store.dispatch("getUserData", {
-  userId,
-  firstName: null,
-  lastName: null,
-  addedProducts: [],
-  removedProducts: [],
-});
+// EDIT THE PRODUCT
+
+async function selectedProduct() {
+  const selectedProdId = document.querySelector("select").value;
+  activateProdEdit()
+
+  await store.dispatch("selectedProduct", {
+    selectedProdId,
+    userId,
+  });
+  reactiveSelectedProdId.value = getSelectedProduct.value;
+  if (getSelectedProduct.value) {
+    updateProdInfo();
+  }
+}
+
+function updateProdInfo() {
+  newProdName.value = "Loading...";
+  newProdPrice.value = "Loading...";
+  newProdName.value = reactiveSelectedProdId.value.prodName;
+  newProdPrice.value = reactiveSelectedProdId.value.prodPrice;
+
+  // EDITING THE CATEGORIES
+  let convertNewArrayToRaw = [];
+  let reConvertNewTagListFromRaw = [];
+  
+  reactiveSelectedProdId.value.prodTags.forEach((el) => {
+    const element = {
+      text: el,
+    };
+    convertNewArrayToRaw.push(element); // NOW EACH ELEMENT HAS .text BEFORE
+  });
+  
+  newArrayToRaw.value.forEach((el) => {
+    reConvertNewTagListFromRaw.push(el.text);
+  });
+  newArrayToRaw.value = convertNewArrayToRaw; // ASSIGNING THE TAG VALUES TO THE NEW ONE
+  newProdTags.value = reConvertNewTagListFromRaw
+}
+
+async function editProduct() {
+  const selectedProdId = document.querySelector("select").value;
+  updateProdInfo()
+  // AJAX
+  if (selectedProdId) {
+    store.commit("prodUploaded");
+    await store.dispatch("patchEditedProduct", {
+      userId,
+      selectedProdId: selectedProdId,
+      editedProdName: newProdName.value,
+      editedProdPrice: newProdPrice.value,
+      editedProdTags: newProdTags.value,
+    });
+  }
+  store.dispatch("fetchUserProducts", { userId });
+}
+function cancelProdEditing() {
+  document.querySelector("select").selectedIndex = 0
+  deactivateProdEdit()
+}
+function activateProdEdit() {
+  return editActive.value = true
+}
+function deactivateProdEdit() {
+  return editActive.value = false
+}
 </script>
 
 <style scoped>
-/* The ***vue-tags-input*** component has scoped styling, 
-so you can edit it with !important in the ../style/vue-tags.css file.
+/* 
+The ***vue-tags-input*** component has scoped styling, 
+so you need to edit it with !important in the ../style/vue-tags.css file.
 Docs: http://www.vue-tags-input.com/#/examples/styling
 */
+.products-grid {
+  width: 50%;
+  margin: 1.5rem auto;
+}
+
+.bad-words {
+  color: red;
+}
+
+.editing-buttons {
+  display: flex;
+  justify-content: center;
+  gap: .8rem;
+}
 </style>

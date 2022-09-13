@@ -1,6 +1,12 @@
 export default {
-  addProductsToLocal(state, {reqProds, renamedUserProds}) {
-    state.products = reqProds.concat(renamedUserProds);
+  addProductsToLocal(state, { reqProds, userProducts }) {
+    state.products = reqProds.concat(userProducts);
+  },
+  newProdUpload(state) {
+    state.auth.userData.isUploaded = false;
+  },
+  prodUploaded(state) {
+    state.auth.userData.isUploaded = true;
   },
   filterCategories(state) {
     // GETTING EACH ARRAY TO EXTRACT IT INTO A SINGLE ARRAY OF UNIQUE CATEGORIES
@@ -11,6 +17,8 @@ export default {
     state.filters.catFlat = state.filters.catArray.flat(1);
     // UNITING IT
     state.filters.catMerged = [...new Set(state.filters.catFlat)];
+    // MAKING THEM GLOBAL
+    localStorage.setItem('prodCategories', [state.filters.catMerged])
   },
   allTrue(state, payload) {
     state.filters.selectAll = !state.filters.selectAll; // Toggling filtering feature
@@ -29,17 +37,6 @@ export default {
     state.auth.isLoggedIn = payload.isLoggedIn;
     state.auth.errorInfo = payload.errorInfo;
   },
-  async signIn(state, payload) {
-    state.auth.isLoggedIn = payload.isLoggedIn;
-    state.auth.errorInfo = payload.errorInfo;
-  },
-  getUserData(state, payload) {
-    state.auth.userData.userId = payload.userId;
-    state.auth.userData.firstName = payload.firstName;
-    state.auth.userData.lastName = payload.lastName;
-    state.auth.userData.addedProducts = payload.addedProducts;
-    state.auth.userData.removedProducts = payload.removedProducts;
-  },
   sendRequest(state, payload) {
     state.auth.userData.userId = payload.userId;
     state.auth.errorInfo = payload.errorInfo;
@@ -47,9 +44,34 @@ export default {
   updateProducts(state, payload) {
     state.products.push(payload);
   },
+  prodUpdated(state) {
+    state.auth.userData.selectedProduct = null
+  },
   logout(state) {
     state.auth.isLoggedIn = false;
+    state.auth.userData.authToken = null;
     localStorage.clear();
+  },
+  autoLogout(state) {
+    // Retains the timeout even after page refresh
+    const waitTime = 1000 * 3600;
+    let executionTime;
+    const initialTime = localStorage.getItem("initialTime");
+
+    if (initialTime === null) {
+      localStorage.setItem("initialTime", new Date().getTime());
+      executionTime = waitTime;
+    } else {
+      executionTime =
+        parseInt(initialTime, 10) + waitTime - new Date().getTime();
+      if (executionTime < 0) executionTime = 0;
+    }
+    
+    setTimeout(() => {
+      state.auth.isLoggedIn = false;
+      state.auth.userData.authToken = null;
+      localStorage.clear();
+    }, executionTime);
   },
   clearLog(state) {
     state.auth.errorInfo = null;

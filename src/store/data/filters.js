@@ -6,4 +6,6 @@ export default {
   catArray: [],
   catFlat: [],
   catMerged: [],
+  tag: '',
+  catSuggested: []
 }
