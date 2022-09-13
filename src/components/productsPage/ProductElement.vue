@@ -46,11 +46,7 @@ function removeProduct() {
 
 <style lang="scss" scoped>
 .categories:not(:last-child) {
-  display: inline-block;
-  margin: 0.4rem;
-  outline: 1px solid rgba(#777, 0.2);
-  border-radius: 2.26px;
-  padding: 0.2rem 0.8rem;
+  @apply text-gray-500 hover:text-gray-700 px-3 py-1 m-1 font-medium text-sm rounded-md inline-block bg-gray-100
 }
 .img-container {
   width: 50%;
@@ -58,6 +54,9 @@ function removeProduct() {
   margin: 0 auto;
 }
 
+.editPrice {
+  @apply text-2xl font-bold text-sky-900
+}
 
 button {
   width: 100%;
