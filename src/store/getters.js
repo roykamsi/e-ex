@@ -1,6 +1,9 @@
 export default {
   isRegistered(state) {
-    return state.auth.userData.userName || localStorage.getItem('firstName')
+    return state.auth.userData.userName || localStorage.getItem('userName')
+  },
+  getUserName(state) {
+    return state.auth.userData.userName || localStorage.getItem('userName')
   },
   getFirstName(state) {
     return state.auth.userData.firstName || localStorage.getItem('firstName')

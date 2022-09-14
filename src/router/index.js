@@ -12,6 +12,7 @@ const isLoggedIn = computed(()=>store.getters.isLoggedIn)
 
 const router = createRouter({
   history: createWebHistory(),
+  linkActiveClass: 'link-active',
   routes: [
     {
       path: "/",
@@ -33,7 +34,7 @@ const router = createRouter({
       meta: {requiresUnAuth: true}
     },
     {
-      path: "/account/:uid",
+      path: "/account",
       name: "Account",
       component: AccountPage,
       meta: {requiresAuth: true}

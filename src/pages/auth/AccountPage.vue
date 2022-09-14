@@ -8,13 +8,14 @@
       }}
     </h1>
     <div v-if="isRegistered">
+      <p>Your actual username is {{getUserName}}</p>
       <button @click="activateChangeUserName = true, changeMode.userName = true" v-if="!activateChangeUserName">Change
         your user name</button>
       <button @click="activateChangeUserName = true, changeMode.firstName = true" v-if="!activateChangeUserName">Change
         your name</button>
       <div v-else>
         <input type="text" name="userName" id="userName" v-model="userNameInput">
-        <button @click="dispatchChange">Change it</button>
+        <button @click="dispatchChange">Confirm</button>
       </div>
     </div>
     <div v-if="!isRegistered">
@@ -26,7 +27,7 @@
           <h2><label for="userName">Choose a great user name</label></h2>
           <input type="text" name="userName" id="userNames" v-model="userName" required aria-required="true" />
         </div>
-        <button type="submit">Yeah, that's correct</button>
+        <button type="submit">Confirm</button>
         <details>
           <summary>What's needed for</summary>
           <p>
@@ -35,6 +36,9 @@
           </p>
         </details>
       </form>
+    </div>
+    <div class="hero">
+      <img src="../../../src/img/undraw_account_re_o7id.svg" alt="Profile edit">
     </div>
   </section>
 </template>
@@ -49,6 +53,7 @@ const name = ref("");
 const lastName = ref("");
 const userName = ref("");
 const storedUserName = computed(() => store.getters.getFirstName);
+const getUserName = computed(() => store.getters.getUserName);
 const userNameInput = ref("")
 const changeMode = ref({
   userName: false,
@@ -94,7 +99,6 @@ async function changeUserName() {
 async function changeFirstName() {
   await store.dispatch('changeFirstName', { userId, userNameInput: userNameInput.value })
   activateChangeUserName.value = false
-  store.dispatch("fetchFirstNameIfRegistered");
 }
 
 </script>
@@ -105,7 +109,19 @@ button {
   margin: auto auto;
 }
 
-button:not(:last-child) {
-  margin-bottom: 1rem;
+input {
+  max-width: 20vw
+}
+
+div:not(.hero) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.hero {
+  padding: 2rem;
+  margin: 0 auto;
+  width: 40vw
 }
 </style>

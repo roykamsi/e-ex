@@ -1,35 +1,76 @@
 <template>
   <section>
     <h1>My store</h1>
-    <h2>Added products</h2>
+    <h2>
+      {{
+        getAddedProducts.length != 0
+          ? "Your products"
+          : "Add your first product"
+      }}
+    </h2>
+    <section class="products-grid" v-if="getAddedProducts.length != 0">
+      <items-gridder>
+        <product-element
+          v-for="product in userProducts"
+          :key="product.id"
+          :pid="product.id"
+          :pname="product.name"
+          :pprice="product.price"
+          :pimage="product.image"
+          :pcategory="product.category || product.category.text"
+        />
+      </items-gridder>
+    </section>
     <p v-if="isUploaded">
       <button @click="newUpload">
         {{
-        getAddedProducts.length != 0
-        ? "Add another product"
-        : "Add your first product"
+          getAddedProducts.length != 0
+            ? "Add another product"
+            : "Add your first product"
         }}
       </button>
     </p>
     <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
       <p>
         <label for="uploadImage">Upload Image</label>
-        <input type="file" accept="image/jpeg" id="uploadImage" @change="imageData" />
+        <input
+          type="file"
+          accept="image/jpeg"
+          id="uploadImage"
+          @change="imageData"
+        />
       </p>
       <p>
         <label for="prodName">Product name</label>
-        <input type="text" id="prodName" v-model="prodName" placeholder="20+ characters allowed" />
+        <input
+          type="text"
+          id="prodName"
+          v-model="prodName"
+          placeholder="20+ characters allowed"
+        />
       </p>
       <p>
         <label for="prodPrice">Product price</label>
-        <input type="number" id="prodPrice" v-model="prodPrice" placeholder="25$ or more" />
+        <input
+          type="number"
+          id="prodPrice"
+          v-model="prodPrice"
+          placeholder="25$ or more"
+        />
       </p>
       <p>
         <label>Product tags</label>
-        <vue-tags-input v-model="tag" :tags="prodTagsRaw" @tags-changed="(newTags) => (prodTagsRaw = newTags)"
-          class="tag-input" :validation="validation" :autocomplete-items="getSuggestedCategories" />
+        <vue-tags-input
+          v-model="tag"
+          :tags="prodTagsRaw"
+          @tags-changed="(newTags) => (prodTagsRaw = newTags)"
+          class="tag-input"
+          :validation="validation"
+          :autocomplete-items="getSuggestedCategories"
+        />
       </p>
       <p>
+        <br>
         <button type="submit">Add product</button>
       </p>
     </form>
@@ -38,23 +79,43 @@
         <div>
           <select name="product" id="productSelect" @change="selectedProduct">
             <option disabled selected>-- Edit a product --</option>
-            <option v-for="product in userProducts" :key="product.id" :value="product.id" :pname="product.name">
+            <option
+              v-for="product in userProducts"
+              :key="product.id"
+              :value="product.id"
+              :pname="product.name"
+            >
               {{ product.name }}
             </option>
           </select>
         </div>
         <div class="input-data" v-if="getSelectedProduct && editActive">
           <p>
-            <input type="text" id="prodName" v-model="newProdName" placeholder="Product name" />
+            <input
+              type="text"
+              id="prodName"
+              v-model="newProdName"
+              placeholder="Product name"
+            />
           </p>
           <p>
-            <input type="number" id="prodPrice" v-model="newProdPrice" placeholder="Product price" />
+            <input
+              type="number"
+              id="prodPrice"
+              v-model="newProdPrice"
+              placeholder="Product price"
+            />
           </p>
           <p>
             <label>Product tags</label>
-            <vue-tags-input v-model="newTag" :tags="newArrayToRaw"
-              @tags-changed="(newTags) => (newArrayToRaw = newTags)" class="tag-input" :validation="validation"
-              :autocomplete-items="getSuggestedCategories" />
+            <vue-tags-input
+              v-model="newTag"
+              :tags="newArrayToRaw"
+              @tags-changed="(newTags) => (newArrayToRaw = newTags)"
+              class="tag-input"
+              :validation="validation"
+              :autocomplete-items="getSuggestedCategories"
+            />
           </p>
           <div class="editing-buttons">
             <button type="submit">Confirm</button>
@@ -66,12 +127,6 @@
     <p v-if="errorInfoLocal" class="error">
       {{ errorInfoLocal }}
     </p>
-    <section class="products-grid">
-      <items-gridder>
-        <product-element v-for="product in userProducts" :key="product.id" :pid="product.id" :pname="product.name"
-          :pprice="product.price" :pimage="product.image" :pcategory="product.category || product.category.text" />
-      </items-gridder>
-    </section>
   </section>
 </template>
 
@@ -206,9 +261,8 @@ async function addProduct() {
       prodTags: prodTags.value,
       userId,
     });
-    
+
     if (isUploaded.value) {
-      
       await store.dispatch("addAndUpdateUserProducts", {
         userId,
         errorInfo: errorInfo.value,
@@ -234,7 +288,7 @@ function newUpload() {
 
 async function selectedProduct() {
   const selectedProdId = document.querySelector("select").value;
-  activateProdEdit()
+  activateProdEdit();
 
   await store.dispatch("selectedProduct", {
     selectedProdId,
@@ -255,24 +309,24 @@ function updateProdInfo() {
   // EDITING THE CATEGORIES
   let convertNewArrayToRaw = [];
   let reConvertNewTagListFromRaw = [];
-  
+
   reactiveSelectedProdId.value.prodTags.forEach((el) => {
     const element = {
       text: el,
     };
     convertNewArrayToRaw.push(element); // NOW EACH ELEMENT HAS .text BEFORE
   });
-  
+
   newArrayToRaw.value.forEach((el) => {
     reConvertNewTagListFromRaw.push(el.text);
   });
   newArrayToRaw.value = convertNewArrayToRaw; // ASSIGNING THE TAG VALUES TO THE NEW ONE
-  newProdTags.value = reConvertNewTagListFromRaw
+  newProdTags.value = reConvertNewTagListFromRaw;
 }
 
 async function editProduct() {
   const selectedProdId = document.querySelector("select").value;
-  updateProdInfo()
+  updateProdInfo();
   // AJAX
   if (selectedProdId) {
     store.commit("prodUploaded");
@@ -287,23 +341,38 @@ async function editProduct() {
   store.dispatch("fetchUserProducts", { userId });
 }
 function cancelProdEditing() {
-  document.querySelector("select").selectedIndex = 0
-  deactivateProdEdit()
+  document.querySelector("select").selectedIndex = 0;
+  deactivateProdEdit();
 }
 function activateProdEdit() {
-  return editActive.value = true
+  return (editActive.value = true);
 }
 function deactivateProdEdit() {
-  return editActive.value = false
+  return (editActive.value = false);
 }
 </script>
 
 <style scoped>
 /* 
 The ***vue-tags-input*** component has scoped styling, 
-so you need to edit it with !important in the ../style/vue-tags.css file.
+so you need to edit it with !important in the ../style/base.css file.
 Docs: http://www.vue-tags-input.com/#/examples/styling
 */
+section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem
+}
+
 .products-grid {
   width: 50%;
   margin: 1.5rem auto;
@@ -316,6 +385,6 @@ Docs: http://www.vue-tags-input.com/#/examples/styling
 .editing-buttons {
   display: flex;
   justify-content: center;
-  gap: .8rem;
+  gap: 0.8rem;
 }
 </style>

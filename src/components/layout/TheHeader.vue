@@ -5,11 +5,13 @@
         <router-link to="/">E-Ex</router-link>
       </h1>
       <h2>
-        <router-link v-if="!isLogged" to="/login">Login</router-link>
+        <button v-if="!isLogged" @click="router.replace('/login')">
+          Login
+        </button>
         <span v-else>
-          <button @click="toPersonalStore">Store</button>
-          <button @click="toAccount">Account</button>
-          <button @click="logout">Logout</button>
+          <router-link to="/mystore" class="heading-button">Store</router-link>
+          <router-link to="/account" class="heading-button">Account</router-link>
+          <button class="heading-button" @click="logout">Logout</button>
         </span>
       </h2>
     </nav>
@@ -25,15 +27,6 @@ const store = useStore();
 const route = useRoute();
 const router = useRouter();
 
-function toAccount() {
-  const token = localStorage.getItem("userId");
-  router.push(`/account/${token}`);
-  route.params.aid = token;
-}
-
-function toPersonalStore() {
-  router.push('/mystore')
-}
 
 const isLogged = computed(() => store.getters["isLoggedIn"])
 
@@ -45,12 +38,19 @@ async function logout() {
 </script>
 
 <style lang="scss" scoped>
+  header {
+    @apply p-4 bg-slate-100 rounded-md mb-8
+  }
+  
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-button:not(:last-child) {
+a:not(:last-child) {
   margin-right: 2rem;
+}
+a:hover {
+  cursor: pointer
 }
 </style>

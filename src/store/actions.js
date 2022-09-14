@@ -22,9 +22,9 @@ export default {
     state.auth.userData.lastName = lastName;
     state.auth.userData.userName = userName;
   },
-  fetchFirstNameIfRegistered({ _, state }) {
+  async fetchFirstNameIfRegistered({ _, state }) {
     const userId = localStorage.getItem("userId");
-    axios
+    await axios
       .get(
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json`
       )
@@ -32,11 +32,15 @@ export default {
         if (res.data != null) {
           const firstName = res.data.firstName;
           localStorage.setItem("firstName", firstName);
-          state.auth.userData.firstName = firstName;
+          const userName = res.data.userName;
+          localStorage.setItem("userName", userName);
+          state.auth.userData.userName = userName;
         } else return;
       });
   },
   changeUserName({ _, state }, { userId, userNameInput }) {
+    localStorage.setItem('userName', userNameInput)
+    state.auth.userData.userName = userNameInput
     axios
       .patch(
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
@@ -48,6 +52,8 @@ export default {
       .catch((err) => (state.auth.errorInfo = err));
   },
   changeFirstName({ _, state }, { userId, userNameInput }) {
+    localStorage.setItem('firstName', userNameInput)
+    state.auth.userData.firstName = userNameInput
     axios
       .patch(
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
@@ -55,7 +61,7 @@ export default {
         {
           firstName: userNameInput,
         }
-      ).then(state.auth.userData.firstName = userNameInput, localStorage.setItem("firstName", userNameInput))
+      )
       .catch((err) => (state.auth.errorInfo = err));
   },
   loadProducts({ commit, state }, { userId }) {
@@ -313,6 +319,7 @@ export default {
     const res = await axios.delete(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
     );
+    await axios.patch(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${authToken}`, {addedProducts: ''})
     const deletedProd = state.auth.userData.addedProducts.find(
       (el) => el.id === prodId
     );

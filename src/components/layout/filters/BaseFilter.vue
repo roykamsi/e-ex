@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Filter products</h2>
+    <button @click="setFilter">Filter products</button>
     <div>
       <label for="name">By name</label>
       <input type="text" id="name" v-model.trim="fName" />
@@ -99,6 +100,9 @@ async function setFilter() {
 </script>
 
 <style lang="scss" scoped>
+  h2 {
+    margin-bottom: 2rem;
+  }
 div {
   display: flex;
   gap: 0.5rem;
@@ -107,7 +111,7 @@ div {
 }
 li {
   display: flex;
+  align-items: center;
   gap: 1rem;
-  justify-content: start;
 }
 </style>

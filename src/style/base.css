@@ -1,11 +1,33 @@
-* {
-  box-sizing: border-box;
-}
 button {
   padding: .6rem 1rem;
 }
 
+label {
+  @apply block text-sm font-medium text-gray-900
+}
 
+input[type="text"]:not(.tag-input.ti-valid.ti-new-tag-input), input[type="email"], input[type="password"], input[type="number"], .vue-tags-input .ti-input, select {
+  @apply rounded-lg focus:ring-amber-600 focus:border-amber-600 border border-sky-900 max-w-xs !important
+}
+.tag-input.ti-valid.ti-new-tag-input, .ti-new-tag-input-wrapper, .vue-tags-input .ti-focus .tag-input {
+  @apply border-none max-w-sm !important
+}
+input[type="checkbox"] {
+  @apply focus:ring-sky-900 h-4 w-4 text-amber-600 border-solid border-gray-500 rounded
+}
+input:not(:last-child, [type="checkbox"]) {
+  margin-bottom: .4rem;
+}
+
+button {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500
+}
+a.heading-button {
+  @apply bg-transparent text-orange-900 text-base font-normal
+}
+a.link-active {
+  @apply font-bold 
+}
 
 /*CUSTOM UTILITY CLASSES*/
 .error {
