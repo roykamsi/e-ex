@@ -30,52 +30,53 @@
         }}
       </button>
     </p>
-    <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
-      <p>
-        <label for="uploadImage">Upload Image</label>
-        <input
-          type="file"
-          accept="image/jpeg"
-          id="uploadImage"
-          @change="imageData"
-        />
-      </p>
-      <p>
-        <label for="prodName">Product name</label>
-        <input
-          type="text"
-          id="prodName"
-          v-model="prodName"
-          placeholder="20+ characters allowed"
-        />
-      </p>
-      <p>
-        <label for="prodPrice">Product price</label>
-        <input
-          type="number"
-          id="prodPrice"
-          v-model="prodPrice"
-          placeholder="25$ or more"
-        />
-      </p>
-      <p>
-        <label>Product tags</label>
-        <vue-tags-input
-          v-model="tag"
-          :tags="prodTagsRaw"
-          @tags-changed="(newTags) => (prodTagsRaw = newTags)"
-          class="tag-input"
-          :validation="validation"
-          :autocomplete-items="getSuggestedCategories"
-        />
-      </p>
-      <p>
-        <br>
-        <button type="submit">Add product</button>
-      </p>
-    </form>
-    <div>
-      <form @submit.prevent="editProduct">
+    <div class="form-nest">
+      <form @submit.prevent="checkBeforeAddingProduct" v-if="!isUploaded">
+        <h2>Add a product</h2>
+        <p>
+          <label for="uploadImage">Upload Image</label>
+          <input
+            type="file"
+            accept="image/jpeg"
+            id="uploadImage"
+            @change="imageData"
+          />
+        </p>
+        <p>
+          <label for="prodName">Product name</label>
+          <input
+            type="text"
+            id="prodName"
+            v-model="prodName"
+            placeholder="20+ characters allowed"
+          />
+        </p>
+        <p>
+          <label for="prodPrice">Product price</label>
+          <input
+            type="number"
+            id="prodPrice"
+            v-model="prodPrice"
+            placeholder="25$ or more"
+          />
+        </p>
+        <p>
+          <label>Product tags</label>
+          <vue-tags-input
+            v-model="tag"
+            :tags="prodTagsRaw"
+            @tags-changed="(newTags) => (prodTagsRaw = newTags)"
+            class="tag-input"
+            :validation="validation"
+            :autocomplete-items="getSuggestedCategories"
+          />
+        </p>
+        <p>
+          <br />
+          <button type="submit">Add product</button>
+        </p>
+      </form>
+      <form @submit.prevent="editProduct" class="editing-form">
         <div>
           <select name="product" id="productSelect" @change="selectedProduct">
             <option disabled selected>-- Edit a product --</option>
@@ -140,6 +141,8 @@ import errorMessages from "../../store/data/errorMessages.js";
 const store = useStore();
 const router = useRouter();
 
+const isLoggedIn = computed(()=> store.getters.isLoggedIn)
+
 const editActive = ref(true);
 const reactiveSelectedProdId = ref();
 const getSelectedProduct = computed(() => store.getters.getSelectedProduct);
@@ -163,6 +166,11 @@ const newProdPrice = ref(null);
 const newTag = ref();
 const newArrayToRaw = ref([]); // SECOND TAG ARRAY
 const newProdTags = ref([]);
+
+// AUTO-LOGOUT checker
+if (isLoggedIn.value) {
+    store.commit("autoLogout");
+  }
 
 // TAG MANAGEMENT
 const prodTagsRaw = ref([]);
@@ -352,7 +360,7 @@ function deactivateProdEdit() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* 
 The ***vue-tags-input*** component has scoped styling, 
 so you need to edit it with !important in the ../style/base.css file.
@@ -363,18 +371,35 @@ section {
   flex-wrap: wrap;
   align-items: center;
   flex-direction: column;
-  gap: .6rem;
+  gap: 0.6rem;
 }
 
-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem
+@media only screen and (min-width: 767px) {
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-nest:not(h2) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 1rem;
+  }
+  form.editing-form {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .input-data {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
 
 .products-grid {
-  width: 50%;
   margin: 1.5rem auto;
 }
 

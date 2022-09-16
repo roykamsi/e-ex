@@ -53,4 +53,10 @@ a:not(:last-child) {
 a:hover {
   cursor: pointer
 }
+@media only screen and (max-width: 767px) {
+  nav {
+    flex-direction: column;
+    justify-content: center;
+  }
+}
 </style>

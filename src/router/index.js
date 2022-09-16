@@ -4,6 +4,7 @@ import ProductElement from "../components/productsPage/ProductElement.vue";
 import LoginPage from "../pages/auth/LoginPage.vue";
 import AccountPage from "../pages/auth/AccountPage.vue";
 import UserPage from "../pages/userPage/UserPage.vue";
+import NotFound from "../pages/NotFound.vue"
 import {computed} from 'vue'
 import store from '../store'
 
@@ -39,7 +40,8 @@ const router = createRouter({
       component: AccountPage,
       meta: {requiresAuth: true}
     },
-    {path: '/mystore', name: 'personal account', component: UserPage, meta: {requiresAuth: true}}
+    {path: '/mystore', name: 'personal account', component: UserPage, meta: {requiresAuth: true}},
+    {path: '/:notFound(.*)*', name: 'Not found', component: NotFound}
   ],
 });
 

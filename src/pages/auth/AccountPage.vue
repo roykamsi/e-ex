@@ -122,6 +122,9 @@ div:not(.hero) {
 .hero {
   padding: 2rem;
   margin: 0 auto;
-  width: 40vw
-}
+  width: 40vw;
+  @media only screen and (max-width: 767px) {
+    width: 100%
+  }
+ }
 </style>

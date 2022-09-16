@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2>Filter products</h2>
     <button @click="setFilter">Filter products</button>
     <div>
       <label for="name">By name</label>

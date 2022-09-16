@@ -14,6 +14,6 @@ export default {}
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: space-between;
-    @apply overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full p-8 text-center rounded-xl
+    @apply overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full p-8 text-center rounded-xl gap-2
   }
 </style>

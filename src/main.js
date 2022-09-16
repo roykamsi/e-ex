@@ -12,7 +12,7 @@ import BaseCard from './components/layout/UI/BaseCard.vue'
 import VueTagsInput from '@sipec/vue3-tags-input'
 import ProductElement from "./components/productsPage/ProductElement.vue";
 import ItemsGridder from './components/productsPage/ItemsGridder.vue'
-
+ 
 
 const app = createApp(App)
 
@@ -21,7 +21,6 @@ app.use(router)
 app.use(store)
 app.use(VueAxios, axios)
 
-export const useStore = store
 
 
 app.component("BaseCard", BaseCard)
