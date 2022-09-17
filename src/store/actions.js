@@ -9,7 +9,8 @@ export default {
     { firstName, lastName, userName, userId, authToken }
   ) {
     axios.put(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
+        state.auth.userData.authToken || localStorage.getItem("idToken")
       }`,
       {
         firstName,
@@ -39,11 +40,12 @@ export default {
       });
   },
   changeUserName({ _, state }, { userId, userNameInput }) {
-    localStorage.setItem('userName', userNameInput)
-    state.auth.userData.userName = userNameInput
+    localStorage.setItem("userName", userNameInput);
+    state.auth.userData.userName = userNameInput;
     axios
       .patch(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
+          state.auth.userData.authToken || localStorage.getItem("idToken")
         }`,
         {
           userName: userNameInput,
@@ -52,11 +54,12 @@ export default {
       .catch((err) => (state.auth.errorInfo = err));
   },
   changeFirstName({ _, state }, { userId, userNameInput }) {
-    localStorage.setItem('firstName', userNameInput)
-    state.auth.userData.firstName = userNameInput
+    localStorage.setItem("firstName", userNameInput);
+    state.auth.userData.firstName = userNameInput;
     axios
       .patch(
-        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+        `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/userDetails.json?auth=${
+          state.auth.userData.authToken || localStorage.getItem("idToken")
         }`,
         {
           firstName: userNameInput,
@@ -177,8 +180,10 @@ export default {
     try {
       axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId
-          }.json?auth=${payload.userId}?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
+            payload.userId
+          }.json?auth=${payload.userId}?auth=${
+            state.auth.userData.authToken || localStorage.getItem("idToken")
           }`,
           { userId: payload.userId, giga: "chad" }
         )
@@ -236,7 +241,10 @@ export default {
     if (state.auth.userData.prodImgUrl) {
       await axios
         .post(
-          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${payload.userId}/addedProducts.json?auth=${state.auth.userData.authToken || localStorage.getItem("idToken")
+          `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${
+            payload.userId
+          }/addedProducts.json?auth=${
+            state.auth.userData.authToken || localStorage.getItem("idToken")
           }`,
           {
             prodName: payload.prodName,
@@ -246,7 +254,7 @@ export default {
           }
         )
         .catch((err) => ((state.auth.errorInfo = err), console.log(err)));
-        commit('prodUploaded')
+      commit("prodUploaded");
     }
   },
   // THIS BELOW LOOKS THE SAME, BUT GETS PRODUCTS LOCALLY
@@ -281,13 +289,13 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
-  fetchUserProducts({ commit, state }, payload) {
-    axios
+  async fetchUserProducts({ commit, state }, payload) {
+    const userId = localStorage.getItem("userId");
+    await axios
       .get(
         `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users.json`
       )
       .then((res) => {
-        const userId = payload.userId;
         const resData = Object.entries(res.data);
         for (const data of resData) {
           if (data[0] === userId) {
@@ -298,7 +306,7 @@ export default {
                 id: prod[0],
                 name: prod[1].prodName,
                 price: prod[1].prodPrice,
-                category: prod[1].prodTags || ['computer'],
+                category: prod[1].prodTags || ["computer"],
                 image: prod[1].prodImgData || "No image",
                 userId,
                 deletable: false,
@@ -313,13 +321,40 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
+  async sendMessageToUser(
+    { _, state },
+    { prodId: selectedProdId, senderName, senderEmail, senderMessage }
+  ) {
+    const userId = localStorage.getItem("userId");
+    const authToken =
+      state.auth.userData.authToken || localStorage.getItem("idToken");
+    let selectedUserId;
+    state.products.forEach((el) => {
+      if (el.id === selectedProdId) {
+        selectedUserId = el.userId;
+      }
+    });
+    const axiosGet = await axios.post(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${selectedUserId}/receivedMessages.json?auth=${authToken}`,
+      {
+        senderName: senderName || userId,
+        senderEmail,
+        senderMessage,
+        selectedProdId,
+      }
+    );
+    state.messaging.isMessageSended = true
+  },
   async removeProduct({ commit, state }, { prodId, userId }) {
     const authToken =
       state.auth.userData.authToken || localStorage.getItem("idToken");
     const res = await axios.delete(
       `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
     );
-    await axios.patch(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${authToken}`, {addedProducts: ''})
+    await axios.patch(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${authToken}`,
+      { addedProducts: "" }
+    );
     const deletedProd = state.auth.userData.addedProducts.find(
       (el) => el.id === prodId
     );

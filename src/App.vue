@@ -3,6 +3,8 @@ import { includes } from "italian-badwords-list/lib/array";
 import { RouterView } from "vue-router";
 import TheHeader from "./components/layout/TheHeader.vue";
 import { firebaseApp, fbStorage, uploadBytes, ref } from "./firebaseInit.js";
+import EmailSendPopup from "./components/layout/UI/EmailSendPopup.vue";
+
 </script>
 
 <template>

@@ -12,7 +12,7 @@ import BaseCard from './components/layout/UI/BaseCard.vue'
 import VueTagsInput from '@sipec/vue3-tags-input'
 import ProductElement from "./components/productsPage/ProductElement.vue";
 import ItemsGridder from './components/productsPage/ItemsGridder.vue'
- 
+import EmailSendPopup from './components/layout/UI/EmailSendPopup.vue'
 
 const app = createApp(App)
 
@@ -22,7 +22,7 @@ app.use(store)
 app.use(VueAxios, axios)
 
 
-
+app.component("EmailSendPopup", EmailSendPopup)
 app.component("BaseCard", BaseCard)
 app.component("VueTagsInput", VueTagsInput)
 app.component('ProductElement', ProductElement)

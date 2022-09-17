@@ -1,13 +1,6 @@
 <template>
   <section>
     <h1>My store</h1>
-    <h2>
-      {{
-        getAddedProducts.length != 0
-          ? "Your products"
-          : "Add your first product"
-      }}
-    </h2>
     <section class="products-grid" v-if="getAddedProducts.length != 0">
       <items-gridder>
         <product-element
@@ -76,7 +69,7 @@
           <button type="submit">Add product</button>
         </p>
       </form>
-      <form @submit.prevent="editProduct" class="editing-form">
+      <form @submit.prevent="editProduct" class="editing-form" v-if="userProducts.length > 0">
         <div>
           <select name="product" id="productSelect" @change="selectedProduct">
             <option disabled selected>-- Edit a product --</option>

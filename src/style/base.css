@@ -6,11 +6,11 @@ label {
   @apply block text-sm font-medium text-gray-900
 }
 
-input[type="text"]:not(.tag-input.ti-valid.ti-new-tag-input), input[type="email"], input[type="password"], input[type="number"], .vue-tags-input .ti-input, select {
-  @apply rounded-lg focus:ring-amber-600 focus:border-amber-600 border border-sky-900 max-w-xs !important
+input[type="text"]:not(.tag-input.ti-valid.ti-new-tag-input), input[type="email"], input[type="password"], input[type="number"], .vue-tags-input .ti-input, select, textarea {
+  @apply rounded-lg focus:ring-amber-600 focus:border-amber-600 border border-sky-900 !important
 }
 .tag-input.ti-valid.ti-new-tag-input, .ti-new-tag-input-wrapper, .vue-tags-input .ti-focus .tag-input {
-  @apply border-none max-w-sm !important
+  @apply border-none max-w-full !important
 }
 input[type="checkbox"] {
   @apply focus:ring-sky-900 h-4 w-4 text-amber-600 border-solid border-gray-500 rounded

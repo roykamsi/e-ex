@@ -6,6 +6,7 @@ import mutations from "./mutations.js";
 import filters from './data/filters.js'
 import filteredProducts from './data/filteredProducts.js'
 import auth from './data/auth.js'
+import messaging from './data/messaging.js'
 
 const store = createStore({
   state() {
@@ -13,7 +14,8 @@ const store = createStore({
       filters,
       products,
       filteredProducts,
-      auth
+      auth,
+      messaging
     };
   },
   getters,

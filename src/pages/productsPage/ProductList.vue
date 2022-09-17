@@ -1,50 +1,63 @@
 <template>
-    <main>
-      <button @click="isFiltering = !isFiltering">{{isFiltering ? 'Hide filtering' : 'Show filtering products'}}</button>
-      <aside>
-        <base-filter v-if="isFiltering"></base-filter>
-      </aside>
-      <section>
-        <h2>Product List</h2>
-        <h1 v-if="products.length === 0">No products yet.</h1>
-        <div v-else>
-          <product-element
-            v-for="product in products"
-            :key="product.id"
-            :pid="product.id"
-            :puserName="product.userName"
-            :pimage="product.image"
-            :pname="product.name"
-            :pprice="product.price"
-            :pcategory="product.category"
-          />
-        </div>
-      </section>
-    </main>
+  <main>
+    <button @click="isFiltering = !isFiltering">
+      {{ isFiltering ? "Hide filtering" : "Show filtering products" }}
+    </button>
+    <aside>
+      <base-filter v-if="isFiltering"></base-filter>
+    </aside>
+    <section>
+      <h2>Product List</h2>
+      <h1 v-if="products.length === 0">No products yet.</h1>
+      <div v-else>
+        <product-element
+          v-for="product in products"
+          :key="product.id"
+          :pid="product.id"
+          :puserName="product.userName"
+          :pimage="product.image"
+          :pname="product.name"
+          :pprice="product.price"
+          :pcategory="product.category"
+        />
+      </div>
+    </section>
+    <Teleport to="body">
+      <Transition
+        enter-active-class="animate__animated animate__zoomIn animate__faster"
+        leave-active-class="animate__animated animate__zoomOut animate__faster"
+      >
+        <EmailSendPopup
+          :selectedUserToSend="selectedUserToSend"
+        ></EmailSendPopup>
+      </Transition>
+    </Teleport>
+  </main>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, Teleport } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import BaseFilter from "../../components/layout/filters/BaseFilter.vue";
 
-const isLoggedIn = computed(()=> store.getters.isLoggedIn)
+const isLoggedIn = computed(() => store.getters.isLoggedIn);
 
 const width = window.innerWidth;
 
 const isFiltering = ref(true);
 
+const selectedUserToSend = localStorage.getItem("selectedUser");
 
-onMounted(()=> {
+onMounted(() => {
   if (width < 768) {
-    isFiltering.value = false
+    isFiltering.value = false;
   }
   // AUTO-LOGOUT checker
   if (isLoggedIn.value) {
     store.commit("autoLogout");
   }
-})
+});
 
 const store = useStore();
 useRoute();
@@ -54,8 +67,7 @@ const userId = computed(() => localStorage.getItem("userId"));
 
 store.dispatch("loadProducts", { userId: userId.value });
 store.dispatch("fetchFirstNameIfRegistered");
-
-
+store.dispatch("fetchUserProducts", { userId });
 
 let products = computed(() => store.getters["getProductsOrFilteredProducts"]);
 
@@ -122,5 +134,4 @@ aside {
     gap: 1rem;
   }
 }
-
 </style>

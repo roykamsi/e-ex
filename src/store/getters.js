@@ -14,12 +14,16 @@ export default {
   getUserProducts(state) {
     return state.auth.userData.addedProducts;
   },
+  isMessageSended(state) {
+    return state.messaging.isMessageSended
+  },
   isUploaded(state) {
     return state.auth.userData.isUploaded
   },
   isUsersProduct(state) {
     const usrProds = state.auth.userData.addedProducts;
     const localUserId = localStorage.getItem('userId')
+      console.log(usrProds);
     return usrProds.some(el=> el.userId === localUserId)
   },
   getFilteredProducts(state) {

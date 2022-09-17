@@ -76,4 +76,19 @@ export default {
   clearLog(state) {
     state.auth.errorInfo = null;
   },
+  getSellerData(state, {prodId}) {
+    let selectedUID;
+    state.products.forEach((el) => {
+      if (el.id === prodId) {
+        selectedUID = el.userId;
+        el.userName !== undefined ? localStorage.setItem('selectedUser', el.userName) : 'the user'
+      }
+    });
+  },
+  isMessaging(state) {
+    state.messaging.isMessageSended = false
+  },
+  cancelMessageSending(state) {
+    state.messaging.isMessageSended = true
+  }
 };
