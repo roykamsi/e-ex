@@ -321,6 +321,26 @@ export default {
         return (state.auth.errorInfo = err.message);
       });
   },
+  async removeProduct({ commit, state }, { prodId, userId }) {
+    const authToken =
+      state.auth.userData.authToken || localStorage.getItem("idToken");
+    const res = await axios.delete(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
+    );
+    await axios.patch(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${authToken}`,
+      { addedProducts: "" }
+    );
+    const deletedProd = state.auth.userData.addedProducts.find(
+      (el) => el.id === prodId
+    );
+    const prodIdx = state.auth.userData.addedProducts.findIndex(
+      (el) => el.id === prodId
+    );
+    state.auth.userData.addedProducts.splice(prodIdx, 1);
+    // const addHistory = await axios.post(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/deletedProducts/${prodId}.json?auth=${authToken}`) // Maybe another time
+  },
+  // MESSAGING SYSTEM
   async sendMessageToUser(
     { _, state },
     { prodId: selectedProdId, senderName, senderEmail, senderMessage }
@@ -345,25 +365,17 @@ export default {
     );
     state.messaging.isMessageSended = true
   },
-  async removeProduct({ commit, state }, { prodId, userId }) {
+  async fetchUserIncomingMessages({_, state}, {userId}) {
     const authToken =
       state.auth.userData.authToken || localStorage.getItem("idToken");
-    const res = await axios.delete(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/addedProducts/${prodId}.json?auth=${authToken}`
-    );
-    await axios.patch(
-      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${authToken}`,
-      { addedProducts: "" }
-    );
-    const deletedProd = state.auth.userData.addedProducts.find(
-      (el) => el.id === prodId
-    );
-    const prodIdx = state.auth.userData.addedProducts.findIndex(
-      (el) => el.id === prodId
-    );
-    state.auth.userData.addedProducts.splice(prodIdx, 1);
-    // const addHistory = await axios.post(`https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/deletedProducts/${prodId}.json?auth=${authToken}`) // Maybe another time
+
+    const axiosGet = await axios.get(
+      `https://e-ex-ddc18-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/receivedMessages.json?auth=${authToken}`)
+
+      state.messaging.receivedMessages = axiosGet.data
+      
   },
+  // END OF MESSAGING SYSTEM
   logout({ commit }) {
     commit("logout");
   },

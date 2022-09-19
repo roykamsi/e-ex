@@ -26,10 +26,10 @@
         <div>
           <h2><label for="userName">Choose a great user name</label></h2>
           <input type="text" name="userName" id="userNames" v-model="userName" required aria-required="true" />
+          <button type="submit">Confirm</button>
         </div>
-        <button type="submit">Confirm</button>
         <details>
-          <summary>What's needed for</summary>
+          <summary>Why do we ask it</summary>
           <p>
             <em>Only your username will be used to be displayed along the product
               you've displayed.</em>
@@ -110,7 +110,12 @@ button {
 }
 
 input {
-  max-width: 20vw
+  margin: 0;
+  max-width: 20vw;
+}
+
+form > input:not(:last-child) {
+  margin-right: 1rem;
 }
 
 div:not(.hero) {

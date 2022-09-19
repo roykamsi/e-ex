@@ -1,8 +1,8 @@
 <template>
   <keep-alive>
     <section>
-      <h2>Login</h2>
       <form @submit.prevent="signIn">
+        <h2>Login</h2>
         <input
           type="email"
           required
@@ -16,13 +16,21 @@
           v-model.trim="userPassword"
           autocomplete="on"
         />
-        <button type="submit" to="/account">Login</button>
-        <button type="button" @click="signup">Signup instead</button>
+        <div class="buttons-wrapper">
+          <button type="submit" to="/account">Login</button>
+          <button type="button" @click="signup">Signup instead</button>
+        </div>
+        <div v-if="outputError">
+          <p class="error">There was an error with the submit.</p>
+          <p class="error__detail">{{ outputError }}</p>
+          <button type="button" @click="clearLog">Gotcha</button>
+        </div>
       </form>
-      <div v-if="outputError">
-        <p class="error">There was an error with the submit.</p>
-        <p class="error__detail">{{ outputError }}</p>
-        <button type="button" @click="clearLog">Gotcha</button>
+      <div class="image-wrapper">
+        <img
+          src="../../img/undraw_secure_login_pdn4.svg"
+          alt="Secure login image"
+        />
       </div>
     </section>
   </keep-alive>
@@ -42,8 +50,9 @@ const userPassword = ref("");
 const outputError = computed(() => store.getters.getError);
 const isLoggedIn = computed(() => store.getters["isLoggedIn"]);
 
-
-let userToken = computed(()=>localStorage.getItem("userId") || store.getters.userToken);
+let userToken = computed(
+  () => localStorage.getItem("userId") || store.getters.userToken
+);
 
 const loginPayload = {
   userId: userToken,
@@ -72,7 +81,7 @@ async function signIn() {
       userToken: userToken.value,
       errorInfo: outputError.value,
     });
-    if (!outputError.value && isLoggedIn.value) router.replace(`/products`)
+    if (!outputError.value && isLoggedIn.value) router.replace(`/products`);
   } catch {
     throw console.log("Something went wrong");
   }
@@ -88,20 +97,24 @@ function clearLog() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 section {
   display: flex;
   min-height: 80vh;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  @apply flex-col md:flex-row block md:flex items-stretch;
 }
 form {
   margin: 2rem auto;
   max-width: 25rem;
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   gap: 0.8rem;
+}
+.buttons-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 input {
   padding: 0.6rem;
@@ -109,5 +122,9 @@ input {
 }
 div > button {
   margin-top: 1rem;
+}
+div.image-wrapper {
+  @apply md:w-[40vw] w-full;
+  margin: 0 auto;
 }
 </style>

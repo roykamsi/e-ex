@@ -2,13 +2,14 @@
   <header>
     <nav>
       <h1>
-        <router-link to="/">E-Ex</router-link>
+        <router-link to="/">Open source Portal</router-link>
       </h1>
       <h2>
         <button v-if="!isLogged" @click="router.replace('/login')">
           Login
         </button>
         <span v-else>
+          <router-link to="/mymessages" class="heading-button">Messages</router-link>
           <router-link to="/mystore" class="heading-button">Store</router-link>
           <router-link to="/account" class="heading-button">Account</router-link>
           <button class="heading-button" @click="logout">Logout</button>

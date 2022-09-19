@@ -1,12 +1,12 @@
 export default {
   isRegistered(state) {
-    return state.auth.userData.userName || localStorage.getItem('userName')
+    return state.auth.userData.userName || localStorage.getItem("userName");
   },
   getUserName(state) {
-    return state.auth.userData.userName || localStorage.getItem('userName')
+    return state.auth.userData.userName || localStorage.getItem("userName");
   },
   getFirstName(state) {
-    return state.auth.userData.firstName || localStorage.getItem('firstName')
+    return state.auth.userData.firstName || localStorage.getItem("firstName");
   },
   getProducts(state) {
     return state.products;
@@ -15,16 +15,19 @@ export default {
     return state.auth.userData.addedProducts;
   },
   isMessageSended(state) {
-    return state.messaging.isMessageSended
+    return state.messaging.isMessageSended;
+  },
+  getUserMessages(state) {
+    return state.messaging.receivedMessages
   },
   isUploaded(state) {
-    return state.auth.userData.isUploaded
+    return state.auth.userData.isUploaded;
   },
   isUsersProduct(state) {
     const usrProds = state.auth.userData.addedProducts;
-    const localUserId = localStorage.getItem('userId')
-      console.log(usrProds);
-    return usrProds.some(el=> el.userId === localUserId)
+    const localUserId = localStorage.getItem("userId");
+    console.log(usrProds);
+    return usrProds.some((el) => el.userId === localUserId);
   },
   getFilteredProducts(state) {
     return state.filteredProducts;
@@ -33,17 +36,19 @@ export default {
     return state.filters.catMerged;
   },
   getSuggestedCategories(state) {
-
     // Here I needed to add a text as key before the tag since the component vue-tag-manager requires it
-    const localStorageCats = localStorage.getItem('prodCategories').split(',')
-    let newArr = []
-    for (const tag of localStorageCats || state.filters.catMerged ) {
-      newArr.push({text: tag})
+    const localStorageCats = localStorage.getItem("prodCategories").split(",");
+    let newArr = [];
+    for (const tag of localStorageCats || state.filters.catMerged) {
+      newArr.push({ text: tag });
     }
 
-    state.filters.catSuggested = newArr.filter((i) => i.text.toLowerCase().indexOf(state.filters.tag.toLowerCase()) !== -1);
+    state.filters.catSuggested = newArr.filter(
+      (i) =>
+        i.text.toLowerCase().indexOf(state.filters.tag.toLowerCase()) !== -1
+    );
 
-    return state.filters.catSuggested
+    return state.filters.catSuggested;
   },
   getSelectAll(state) {
     return state.filters.selectAll;
@@ -105,16 +110,16 @@ export default {
     }
   },
   getSelectedProduct(state) {
-    return state.auth.userData.selectedProduct
+    return state.auth.userData.selectedProduct;
   },
   isLoggedIn(state) {
     return state.auth.isLoggedIn || localStorage.getItem("idToken");
   },
   getAuthToken(state) {
-    return state.auth.userData.userToken // Expires in 1h
+    return state.auth.userData.userToken; // Expires in 1h
   },
   userToken(state) {
-    return state.auth.userData.userId
+    return state.auth.userData.userId;
   },
   getError(state) {
     return state.auth.errorInfo;

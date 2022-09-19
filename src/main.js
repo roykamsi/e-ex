@@ -13,6 +13,7 @@ import VueTagsInput from '@sipec/vue3-tags-input'
 import ProductElement from "./components/productsPage/ProductElement.vue";
 import ItemsGridder from './components/productsPage/ItemsGridder.vue'
 import EmailSendPopup from './components/layout/UI/EmailSendPopup.vue'
+import IncomingUserMessages from './pages/userPage/IncomingUserMessages.vue'
 
 const app = createApp(App)
 

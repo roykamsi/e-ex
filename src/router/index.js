@@ -3,6 +3,7 @@ import ProductList from "../pages/productsPage/ProductList.vue";
 import ProductElement from "../components/productsPage/ProductElement.vue";
 import LoginPage from "../pages/auth/LoginPage.vue";
 import AccountPage from "../pages/auth/AccountPage.vue";
+import UserIncomingMessages from '../pages/userPage/IncomingUserMessages.vue'
 import UserPage from "../pages/userPage/UserPage.vue";
 import NotFound from "../pages/NotFound.vue"
 import {computed} from 'vue'
@@ -38,6 +39,12 @@ const router = createRouter({
       path: "/account",
       name: "Account",
       component: AccountPage,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: "/mymessages",
+      name: "Messages",
+      component: UserIncomingMessages,
       meta: {requiresAuth: true}
     },
     {path: '/mystore', name: 'personal account', component: UserPage, meta: {requiresAuth: true}},
